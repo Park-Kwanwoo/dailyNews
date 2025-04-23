@@ -7,7 +7,6 @@
     </li>
   </ul>
 </template>
-
 <style scoped lang="scss">
 .menus {
   height: 20px;
