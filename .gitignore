@@ -41,3 +41,4 @@ src/main/resources/application-dev.yml
 dailyNews.*
 docker-compose.yml
 Dockerfile
+nodeenv-22
