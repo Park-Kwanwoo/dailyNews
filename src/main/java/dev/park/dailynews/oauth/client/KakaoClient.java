@@ -1,12 +1,12 @@
 package dev.park.dailynews.oauth.client;
 
+import dev.park.dailynews.oauth.domain.KakaoToken;
 import dev.park.dailynews.oauth.domain.KakaoUserInfo;
 import dev.park.dailynews.oauth.domain.OAuth2UserInfo;
 import dev.park.dailynews.oauth.domain.OAuthProvider;
-import dev.park.dailynews.oauth.domain.KakaoToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -14,23 +14,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-@Component
 @RequiredArgsConstructor
+@Component
 @Slf4j
 public class KakaoClient implements OAuthClient {
 
-    @Value("${oauth.kakao.grant-type}")
-    private String grant_type;
-
-    @Value("${oauth.kakao.client-id}")
-    private String client_id;
-
-    @Value("${oauth.kakao.client-secret}")
-    private String client_secret;
-
-    @Value("${oauth.kakao.redirect-uri}")
-    private String redirect_uri;
-
+    private final KakaoProperties kakaoProperties;
     private final static String TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private final static String USER_IFO_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -74,10 +63,10 @@ public class KakaoClient implements OAuthClient {
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", grant_type);
-        body.add("client_id", client_id);
-        body.add("redirect_uri", redirect_uri);
-        body.add("client_secret", client_secret);
+        body.add("grant_type", kakaoProperties.getGrantType());
+        body.add("client_id", kakaoProperties.getClientId());
+        body.add("redirect_uri", kakaoProperties.getRedirectUri());
+        body.add("client_secret", kakaoProperties.getClientSecret());
         body.add("code", code);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
