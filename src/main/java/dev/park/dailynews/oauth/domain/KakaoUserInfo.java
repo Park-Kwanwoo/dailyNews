@@ -3,10 +3,7 @@ package dev.park.dailynews.oauth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class KakaoUserInfo implements OAuth2UserInfo {
-
-    @JsonProperty("kakao_account")
-    private KakaoAccount kakaoAccount;
+public record KakaoUserInfo(@JsonProperty("kakao_account") KakaoAccount kakaoAccount) implements OAuth2UserInfo {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record KakaoAccount(String email, Profile profile) {

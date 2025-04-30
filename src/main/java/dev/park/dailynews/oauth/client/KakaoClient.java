@@ -4,9 +4,10 @@ import dev.park.dailynews.oauth.domain.KakaoToken;
 import dev.park.dailynews.oauth.domain.KakaoUserInfo;
 import dev.park.dailynews.oauth.domain.OAuth2UserInfo;
 import dev.park.dailynews.oauth.domain.OAuthProvider;
+import dev.park.dailynews.oauth.response.KakaoLoginParams;
+import dev.park.dailynews.oauth.response.OAuthLoginParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class KakaoClient implements OAuthClient {
 
     private final KakaoProperties kakaoProperties;
     private final static String TOKEN_URL = "https://kauth.kakao.com/oauth/token";
-    private final static String USER_IFO_URL = "https://kapi.kakao.com/v2/user/me";
+    private final static String USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
 
     private final RestTemplate rt;
 
@@ -30,9 +31,9 @@ public class KakaoClient implements OAuthClient {
         return OAuthProvider.KAKAO;
     }
     @Override
-    public String requestAccessToken(String code) {
+    public String requestAccessToken(OAuthLoginParams params) {
 
-        HttpEntity<MultiValueMap<String, String>> request = tokenRequest(code);
+        HttpEntity<MultiValueMap<String, String>> request = tokenRequest(params.getCode());
 
         KakaoToken kakaoToken = rt.postForObject(
                 TOKEN_URL,
@@ -49,7 +50,7 @@ public class KakaoClient implements OAuthClient {
         HttpEntity<MultiValueMap<String, String>> request = userInfoRequest(accessToken);
 
         KakaoUserInfo kakaoUserInfo = rt.postForObject(
-                USER_IFO_URL,
+                USER_INFO_URL,
                 request,
                 KakaoUserInfo.class
         );
