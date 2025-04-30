@@ -8,7 +8,7 @@ export default class HttpRepository {
 
   public login(config: HttpRequestConfig) {
     return this.httpClient
-      .request({ ...config, method: 'GET' })
+      .request({ ...config })
       .then((r) => {
         return r
       })
