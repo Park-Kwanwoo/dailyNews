@@ -1,6 +1,6 @@
 package dev.park.dailynews.repository;
 
-import dev.park.dailynews.domain.User;
+import dev.park.dailynews.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
