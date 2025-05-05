@@ -1,22 +1,32 @@
 package dev.park.dailynews.config;
 
-import dev.park.dailynews.interceptor.CustomInterceptor;
-import dev.park.dailynews.jwt.domain.JwtTokenProvider;
+import dev.park.dailynews.interceptor.TokenInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenInterceptor tokenInterceptor;
+    private final RequestInfoResolver requestInfoResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CustomInterceptor(jwtTokenProvider));
+        registry.addInterceptor(tokenInterceptor)
+                .excludePathPatterns("/login/**")
+                .excludePathPatterns("/error");
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(requestInfoResolver);
     }
 
     @Override
