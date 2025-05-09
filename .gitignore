@@ -42,3 +42,9 @@ dailyNews.*
 docker-compose.yml
 Dockerfile
 nodeenv-22
+
+### redis ###
+redis/
+
+### HTTP ###
+http/

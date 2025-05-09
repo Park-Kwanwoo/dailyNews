@@ -5,7 +5,7 @@ import dev.park.dailynews.dto.response.ApiResponse;
 import dev.park.dailynews.dto.response.LoginResponse;
 import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
 import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
-import dev.park.dailynews.facade.SocialLoginFacade;
+import dev.park.dailynews.service.TokenSessionService;
 import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.service.SocialLoginService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,10 +24,10 @@ import static org.springframework.http.HttpHeaders.SET_COOKIE;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class SocialController {
+public class SocialLoginController {
 
     private final SocialLoginService SocialLoginService;
-    private final SocialLoginFacade socialLoginFacade;
+    private final TokenSessionService tokenSessionService;
 
     @PostMapping("/login/kakao")
     public ResponseEntity<ApiResponse<LoginResponse>> kakaoLogin(@RequestBody KakaoLoginParams params,
@@ -35,9 +35,9 @@ public class SocialController {
                                                                  UserSessionRequest userSessionRequest) throws Exception {
 
         UserContext userContext = SocialLoginService.login(params);
-        LoginResponse loginResponse = socialLoginFacade.issueSessionAndToken(userContext, userSessionRequest);
+        LoginResponse loginResponse = tokenSessionService.issueSessionAndToken(userContext, userSessionRequest);
         res.addHeader(SET_COOKIE, setCookie("DN_AUT", loginResponse.getAccessToken()));
-        res.addHeader(SET_COOKIE, setCookie("DN_SES", loginResponse.getUserSession()));
+        res.addHeader(SET_COOKIE, setCookie("DN_SES", loginResponse.getSessionId()));
         return new ResponseEntity<>(ApiResponse.successWithContent(loginResponse), HttpStatus.OK);
     }
 
@@ -47,9 +47,9 @@ public class SocialController {
                                                                  UserSessionRequest userSessionRequest) throws Exception {
 
         UserContext userContext = SocialLoginService.login(params);
-        LoginResponse loginResponse = socialLoginFacade.issueSessionAndToken(userContext, userSessionRequest);
+        LoginResponse loginResponse = tokenSessionService.issueSessionAndToken(userContext, userSessionRequest);
         res.addHeader(SET_COOKIE, setCookie("DN_AUT", loginResponse.getAccessToken()));
-        res.addHeader(SET_COOKIE, setCookie("DN_SES", loginResponse.getUserSession()));
+        res.addHeader(SET_COOKIE, setCookie("DN_SES", loginResponse.getSessionId()));
         return new ResponseEntity<>(ApiResponse.successWithContent(loginResponse), HttpStatus.OK);
     }
 

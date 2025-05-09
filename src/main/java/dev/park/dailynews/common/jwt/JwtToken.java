@@ -29,24 +29,35 @@ public class JwtToken {
     }
 
     public String generateAccessToken(UserContext userContext) {
-        return generateToken(jwtProperties.accessExpirationTime(), userContext.getEmail(), userContext.getUuid());
-    }
 
-    public String generateRefreshToken(UserContext userContext) {
-        return generateToken(jwtProperties.refreshExpirationTime(), userContext.getEmail(), userContext.getUuid());
-    }
-
-    private String generateToken(long expirationTime, String email, String uuid) {
         Date now = new Date();
+        Date expiration = new Date(now.getTime() + jwtProperties.accessExpirationTime());
 
         return Jwts.builder()
                 .header()
                 .add("typ", "JWT")
                 .and()
-                .claim("uuid", uuid)
-                .subject(email)
+                .claim("uuid", userContext.getUuid())
+                .subject(userContext.getEmail())
                 .issuedAt(now)
-                .expiration(new Date(now.getTime() + expirationTime))
+                .expiration(expiration)
+                .issuer(jwtProperties.issuer())
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+    public String generateRefreshToken(UserContext userContext) {
+
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + jwtProperties.accessExpirationTime());
+
+        return Jwts.builder()
+                .header()
+                .add("typ", "JWT")
+                .and()
+                .claim("uuid", userContext.getUuid())
+                .issuedAt(now)
+                .expiration(expiration)
                 .issuer(jwtProperties.issuer())
                 .signWith(getSecretKey())
                 .compact();

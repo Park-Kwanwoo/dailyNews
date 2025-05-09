@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record KakaoUserInfo(@JsonProperty("kakao_account") KakaoAccount kakaoAccount) implements SocialUserInfo {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record KakaoAccount(String email, Profile profile) {
+    public record KakaoAccount(String email, Profile profile) {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        record Profile(String nickname) {
+        public record Profile(String nickname) {
         }
     }
 
