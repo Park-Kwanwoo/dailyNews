@@ -2,8 +2,8 @@ package dev.park.dailynews.service;
 
 import dev.park.dailynews.domain.social.SocialUserInfo;
 import dev.park.dailynews.domain.user.User;
-import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
+import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

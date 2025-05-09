@@ -24,10 +24,6 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -45,18 +41,22 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // valid
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Anthrophic
+    implementation 'com.anthropic:anthropic-java:1.2.0'
+
+    // h2 DB
+    runtimeOnly 'com.h2database:h2'
 }
 
 // 생성자 바인딩을 위해 컴파일 옵션 추가
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += "-parameters"
 }
 
-tasks.named('test') {
-    outputs.dir snippetsDir
-}
-
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    dependsOn test
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

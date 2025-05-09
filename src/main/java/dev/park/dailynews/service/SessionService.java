@@ -1,10 +1,11 @@
 package dev.park.dailynews.service;
 
+import dev.park.dailynews.common.session.SessionCrypto;
 import dev.park.dailynews.domain.user.UserSession;
 import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.repository.RedisSessionRepository;
 import dev.park.dailynews.dto.request.UserSessionRequest;
-import dev.park.dailynews.model.SessionContext;
+import dev.park.dailynews.model.SessionId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +14,28 @@ import org.springframework.stereotype.Service;
 public class SessionService {
 
     private final RedisSessionRepository redisSessionRepository;
+    private final SessionCrypto sessionCrypto;
 
-    public SessionContext findOrCreate(UserContext userContext,
-                                       UserSessionRequest userSessionRequest) {
+    public String findOrCreateSession(UserContext userContext,
+                                         UserSessionRequest userSessionRequest) throws Exception {
 
-        UserSession userSession = userSessionRequest.toSessionInfo(userContext);
-        UserSession session = redisSessionRepository.findByEmail(userSession.getEmail())
-                .orElseGet(() -> saveSession(userSession));
+        UserSession session = redisSessionRepository.findByEmail(userContext.getEmail())
+                .orElseGet(() -> saveSession(userContext, userSessionRequest));
 
-        return new SessionContext(session.getUuid());
+        String encodedSessionId = sessionCrypto.encode(session);
+        return encodedSessionId;
     }
 
-    public UserSession saveSession(UserSession userSession) {
+    public UserSession saveSession(UserContext userContext,
+                                   UserSessionRequest userSessionRequest) {
+
+        UserSession userSession = UserSession.builder()
+                .uuid(userContext.getUuid())
+                .email(userContext.getEmail())
+                .ipAddress(userSessionRequest.getIp())
+                .userAgent(userSessionRequest.getUserAgent())
+                .build();
+
         return redisSessionRepository.save(userSession);
     }
 }

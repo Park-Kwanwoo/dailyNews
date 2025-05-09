@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class SessionContext {
+public class SessionId {
 
     private final String uuid;
 

@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 public class LoginResponse {
 
     private final String email;
+    private final String nickname;
 
     @JsonIgnore
     private final String accessToken;
 
     @JsonIgnore
-    private final String userSession;
+    private final String sessionId;
 }
