@@ -48,3 +48,6 @@ redis/
 
 ### HTTP ###
 http/
+
+### test ###
+src/test/resources/json/**
