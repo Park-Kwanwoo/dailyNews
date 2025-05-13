@@ -50,6 +50,10 @@ dependencies {
 
     // h2 DB
     runtimeOnly 'com.h2database:h2'
+
+    // wiremock
+    testImplementation 'org.wiremock:wiremock-standalone:3.13.0'
+
 }
 
 // 생성자 바인딩을 위해 컴파일 옵션 추가

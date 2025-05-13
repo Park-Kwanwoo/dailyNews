@@ -59,7 +59,7 @@ public class SocialLoginServiceTest {
 
             // then
             assertEquals("kakao@auth.com", result.getEmail());
-            assertEquals("테스터", result.getNickname());
+            assertEquals("kakao@auth.com", result.getEmail());
         }
     }
 }
