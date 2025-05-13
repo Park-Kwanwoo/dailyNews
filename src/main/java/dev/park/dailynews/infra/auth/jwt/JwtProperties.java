@@ -1,4 +1,4 @@
-package dev.park.dailynews.common.jwt;
+package dev.park.dailynews.infra.auth.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

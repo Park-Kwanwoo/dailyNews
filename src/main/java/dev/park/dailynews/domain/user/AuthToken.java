@@ -7,9 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Getter
 @AllArgsConstructor
 @Builder
@@ -25,4 +22,8 @@ public class AuthToken {
     private String accessToken;
 
     private String refreshToken;
+
+    private String ip;
+
+    private String userAgent;
 }
