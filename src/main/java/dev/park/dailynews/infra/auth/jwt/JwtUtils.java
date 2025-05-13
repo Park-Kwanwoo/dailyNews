@@ -74,12 +74,8 @@ public class JwtUtils {
         return claimsResolver.apply(claims);
     }
 
-    public String extractUserEmail(String token) {
+    public String extractSubject(String token) {
         return extractClaims(token, Claims::getSubject);
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaims(token, Claims::getExpiration);
     }
 
     public String extractIssuer(String token) {
