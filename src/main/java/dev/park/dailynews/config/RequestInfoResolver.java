@@ -1,6 +1,6 @@
 package dev.park.dailynews.config;
 
-import dev.park.dailynews.dto.request.UserSessionRequest;
+import dev.park.dailynews.model.SessionContext;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -11,10 +11,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class RequestInfoResolver implements HandlerMethodArgumentResolver {
-
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(UserSessionRequest.class);
+        return parameter.getParameterType().equals(SessionContext.class);
     }
 
     @Override
@@ -24,7 +23,7 @@ public class RequestInfoResolver implements HandlerMethodArgumentResolver {
         String ip = extractClientIp(request);
         String userAgent = request.getHeader("User-Agent");
 
-        return UserSessionRequest.builder()
+        return SessionContext.builder()
                 .ip(ip)
                 .userAgent(userAgent)
                 .build();
