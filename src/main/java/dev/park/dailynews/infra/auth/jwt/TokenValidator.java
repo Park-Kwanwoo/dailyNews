@@ -30,7 +30,7 @@ public class TokenValidator {
     private boolean isTokenInfoMatch(String token, SessionContext session) {
 
         String uuid = jwtUtils.extractUUID(token);
-        String email = jwtUtils.extractUserEmail(token);
+        String email = jwtUtils.extractSubject(token);
         String issuer = jwtUtils.extractIssuer(token);
         TokenContext savedToken = tokenService.get(uuid);
 
