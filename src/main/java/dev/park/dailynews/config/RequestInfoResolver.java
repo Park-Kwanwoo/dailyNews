@@ -1,5 +1,6 @@
 package dev.park.dailynews.config;
 
+import dev.park.dailynews.common.SessionUtils;
 import dev.park.dailynews.model.SessionContext;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -20,23 +21,8 @@ public class RequestInfoResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        String ip = extractClientIp(request);
-        String userAgent = request.getHeader("User-Agent");
 
-        return SessionContext.builder()
-                .ip(ip)
-                .userAgent(userAgent)
-                .build();
-    }
-
-    private String extractClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-
-        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        } else {
-            ip = ip.split(",")[0].trim();
-        }
-        return ip;
+        SessionContext session = SessionUtils.getSessionInfo(request);
+        return session;
     }
 }
