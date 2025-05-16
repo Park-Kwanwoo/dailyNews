@@ -8,6 +8,9 @@ export type HttpRequestConfig = {
   path: string
   params?: any
   body?: any
+  headers?: {
+    Authorization?: string
+  }
 }
 
 @singleton()
@@ -15,6 +18,7 @@ export default class AxiosHttpClient {
   private readonly client: AxiosInstance = axios.create({
     timeout: 300000,
     timeoutErrorMessage: '타임아웃',
+    withCredentials: true,
   })
 
   public request(config: HttpRequestConfig) {

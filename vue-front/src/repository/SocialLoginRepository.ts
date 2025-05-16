@@ -1,13 +1,14 @@
 import HttpRepository from '@/repository/HttpRepository.ts'
 import { inject, singleton } from 'tsyringe'
-import NaverLoginParams from '@/request/NaverLoginParams.ts'
-import KakaoLoginParams from '@/request/KakaoLoginParams.ts'
+import router from '@/router'
+import { ElMessage } from 'element-plus'
+import LoginParams from '@/request/LoginParams.ts'
 
 @singleton()
 export default class SocialLoginRepository {
   constructor(@inject(HttpRepository) private readonly httpRepository: HttpRepository) {}
 
-  public naverLogin(req: NaverLoginParams) {
+  public naverLogin(req: LoginParams) {
     return this.httpRepository
       .login({
         path: '/api/login/naver',
@@ -15,25 +16,27 @@ export default class SocialLoginRepository {
         method: 'POST',
       })
       .then((r) => {
-        return r
+        router.replace('/')
       })
       .catch((e) => {
-        return e
+        ElMessage.error(e.message)
+        router.replace('/login')
       })
   }
 
-  public kakaoLogin(req: KakaoLoginParams) {
+  public kakaoLogin(req: LoginParams) {
     return this.httpRepository
       .login({
-        path: '/api/login/kakao',
+        path: `/api/login/kakao`,
         body: req,
         method: 'POST',
       })
       .then((r) => {
-        return r
+        router.replace('/')
       })
       .catch((e) => {
-        return e
+        ElMessage.error(e.message)
+        router.replace('/login')
       })
   }
 }

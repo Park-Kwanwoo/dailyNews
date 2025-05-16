@@ -5,6 +5,7 @@ import dev.park.dailynews.dto.response.ApiResponse;
 import dev.park.dailynews.dto.response.TokenResponse;
 import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
 import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
+import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.model.SessionContext;
 import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.service.SocialLoginService;
@@ -14,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,25 +25,13 @@ public class SocialLoginController {
     private final SocialLoginService SocialLoginService;
     private final TokenService tokenService;
 
-    @PostMapping("/login/kakao")
-    public ResponseEntity<ApiResponse<Void>> kakaoLogin(@RequestBody KakaoLoginParams params,
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<ApiResponse<Void>> socialLogin(@RequestBody SocialLoginParams params,
                                                                  HttpServletResponse response,
                                                                  SessionContext sessionContext) {
 
         UserContext userContext = SocialLoginService.login(params);
         TokenResponse token = tokenService.findOrCreateToken(userContext, sessionContext);
-        CookieUtils.setCookie(response, token.getRefreshToken());
-        CookieUtils.setAuthorization(response, token.getAccessToken());
-        return new ResponseEntity<>(ApiResponse.successWithNoContent(), HttpStatus.OK);
-    }
-
-    @PostMapping("/login/naver")
-    public ResponseEntity<ApiResponse<Void>> naverLogin(@RequestBody NaverLoginParams params,
-                                                                 HttpServletResponse response,
-                                                                 SessionContext session) throws Exception {
-
-        UserContext userContext = SocialLoginService.login(params);
-        TokenResponse token = tokenService.findOrCreateToken(userContext, session);
         CookieUtils.setCookie(response, token.getRefreshToken());
         CookieUtils.setAuthorization(response, token.getAccessToken());
         return new ResponseEntity<>(ApiResponse.successWithNoContent(), HttpStatus.OK);

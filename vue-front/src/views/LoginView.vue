@@ -2,21 +2,18 @@
 import { container } from 'tsyringe'
 import SocialLoginRepository from '@/repository/SocialLoginRepository.ts'
 import { onMounted, reactive } from 'vue'
-import NaverLoginParams from '@/request/NaverLoginParams'
-import KakaoLoginParams from '@/request/KakaoLoginParams'
 import { useSocialEnv } from '@/config/useSocialEnv.ts'
+import LoginParams from '@/request/LoginParams.ts'
 
 const SOCIAL_LOGIN_REPOSITORY = container.resolve(SocialLoginRepository)
 const { socialEnv } = useSocialEnv()
 
 type StateType = {
-  naverLoginParams: NaverLoginParams
-  kakooLoginParams: KakaoLoginParams
+  loginParams: LoginParams
 }
 
 const states = reactive<StateType>({
-  naverLoginParams: new NaverLoginParams(),
-  kakooLoginParams: new KakaoLoginParams(),
+  loginParams: new LoginParams(),
 })
 
 function redirectToKakaoLogin() {
@@ -33,20 +30,22 @@ onMounted(() => {
   const state = query.get('state')
 
   if (code && state) {
-    states.naverLoginParams.state = state
-    states.naverLoginParams.code = code
-    naverLogin(states.naverLoginParams)
+    states.loginParams.state = state
+    states.loginParams.code = code
+    states.loginParams.provider = 'NAVER'
+    naverLogin(states.loginParams)
   } else if (code) {
-    states.kakooLoginParams.code = code
-    kakaoLogin(states.kakooLoginParams)
+    states.loginParams.code = code
+    states.loginParams.provider = 'KAKAO'
+    kakaoLogin(states.loginParams)
   }
 })
 
-function kakaoLogin(params: KakaoLoginParams) {
+function kakaoLogin(params: LoginParams) {
   SOCIAL_LOGIN_REPOSITORY.kakaoLogin(params)
 }
 
-function naverLogin(params: NaverLoginParams) {
+function naverLogin(params: LoginParams) {
   SOCIAL_LOGIN_REPOSITORY.naverLogin(params)
 }
 </script>
