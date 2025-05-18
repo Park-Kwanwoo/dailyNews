@@ -24,9 +24,6 @@ public class NaverClient implements SocialClient {
     private final NaverProperties naverProperties;
     private final RestTemplate rt;
 
-    private final static String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
-    private final static String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
-
     @Override
     public SocialProvider socialProvider() {
         return SocialProvider.NAVER;
@@ -38,7 +35,7 @@ public class NaverClient implements SocialClient {
         HttpEntity<MultiValueMap<String, String>> request = makeTokenRequest(params.getCode());
 
         NaverToken naverToken = rt.postForObject(
-                TOKEN_URL,
+                naverProperties.getTokenUrl(),
                 request,
                 NaverToken.class
                 );
@@ -52,7 +49,7 @@ public class NaverClient implements SocialClient {
         HttpEntity<MultiValueMap<String, String>> request = makeUserInfoRequest(accessToken);
 
         NaverUserInfo naverUserInfo = rt.postForObject(
-                USER_INFO_URL,
+                naverProperties.getUserInfoUrl(),
                 request,
                 NaverUserInfo.class
         );

@@ -25,7 +25,7 @@ public class SocialLoginController {
     private final SocialLoginService SocialLoginService;
     private final TokenService tokenService;
 
-    @PostMapping("/login/{provider}")
+    @PostMapping("/social/login")
     public ResponseEntity<ApiResponse<Void>> socialLogin(@RequestBody SocialLoginParams params,
                                                                  HttpServletResponse response,
                                                                  SessionContext sessionContext) {

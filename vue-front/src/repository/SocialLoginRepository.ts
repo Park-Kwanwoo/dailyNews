@@ -11,7 +11,7 @@ export default class SocialLoginRepository {
   public naverLogin(req: LoginParams) {
     return this.httpRepository
       .login({
-        path: '/api/login/naver',
+        path: '/api/social/login',
         body: req,
         method: 'POST',
       })
@@ -27,7 +27,7 @@ export default class SocialLoginRepository {
   public kakaoLogin(req: LoginParams) {
     return this.httpRepository
       .login({
-        path: `/api/login/kakao`,
+        path: '/api/social/login',
         body: req,
         method: 'POST',
       })

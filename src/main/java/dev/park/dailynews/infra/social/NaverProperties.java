@@ -12,5 +12,7 @@ public class NaverProperties {
     private final String grantType;
     private final String clientId;
     private final String clientSecret;
-
+    private final String tokenUrl;
+    private final String userInfoUrl;
 }
+
