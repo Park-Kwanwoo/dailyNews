@@ -53,7 +53,7 @@ public class TokenValidatorTest {
         given(jwtUtils.extractIssuer(mockToken)).willReturn(mockIssuer);
         given(jwtUtils.extractSubject(mockToken)).willReturn(mockEmail);
         given(jwtUtils.getJwtProperties()).willReturn(new JwtProperties("", 1, 1, mockIssuer));
-        given(tokenService.get(mockUUID)).willReturn(savedToken);
+        given(tokenService.getToken(mockUUID)).willReturn(savedToken);
 
         // when
         boolean validToken = tokenValidator.validToken(mockToken, session);
@@ -82,7 +82,7 @@ public class TokenValidatorTest {
         given(jwtUtils.extractUUID(mockToken)).willReturn(mockUUID);
         given(jwtUtils.extractIssuer(mockToken)).willReturn(mockIssuer);
         given(jwtUtils.extractSubject(mockToken)).willReturn(mockEmail);
-        given(tokenService.get(mockUUID)).willReturn(savedToken);
+        given(tokenService.getToken(mockUUID)).willReturn(savedToken);
 
         // when
         boolean validToken = tokenValidator.validToken(mockToken, session);

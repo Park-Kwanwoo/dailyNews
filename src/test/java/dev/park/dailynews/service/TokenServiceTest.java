@@ -78,7 +78,7 @@ public class TokenServiceTest {
             given(redisTokenRepository.findByUuid(userContext.getUuid())).willReturn(Optional.of(mockToken));
 
             // when
-            TokenContext result = tokenService.get(userContext.getUuid());
+            TokenContext result = tokenService.getToken(userContext.getUuid());
 
             // then
             assertEquals("access-token", result.getAccessToken());
@@ -109,7 +109,7 @@ public class TokenServiceTest {
             given(redisTokenRepository.findByUuid(userContext.getUuid())).willReturn(Optional.of(mockToken));
 
             // when
-            TokenContext result = tokenService.get(userContext.getUuid());
+            TokenContext result = tokenService.getToken(userContext.getUuid());
 
             // then
             assertEquals("access-token", result.getAccessToken());

@@ -1,15 +1,14 @@
 package dev.park.dailynews.service;
 
 import dev.park.dailynews.domain.social.KakaoUserInfo;
+import dev.park.dailynews.domain.social.SocialProvider;
 import dev.park.dailynews.domain.social.SocialUserInfo;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,33 +32,27 @@ public class SocialLoginServiceTest {
     @Mock
     private SocialClientService socialClientService;
 
+    @Test
+    @DisplayName("카카오_소셜_로그인_토큰_정보_받아오기")
+    void GET_KAKAO_SOCIAL_LOGIN_TOKEN_INFO() {
 
-    @Nested
-    @DisplayName("성공 케이스")
-    class SUCCESS_TEST {
+        String code = "test-auth-code";
+        SocialLoginParams params = new KakaoLoginParams(code);
+        SocialUserInfo userInfo = new KakaoUserInfo(new KakaoUserInfo.KakaoAccount(
+                "kakao@auth.com",
+                new KakaoUserInfo.KakaoAccount.Profile("테스터")
+        ));
 
-        @Test
-        @DisplayName("소셜 로그인 토큰 정보 받아오기")
-        void GET_SOCIAL_LOGIN_TOKEN_INFO() {
+        // given
+        given(socialClientService.request(params)).willReturn(userInfo);
+        given(userRepository.findByEmail("kakao@auth.com")).willReturn(Optional.empty());
+        given(userRepository.save(any(User.class))).willAnswer(i -> i.getArgument(0));
 
-            String code = "test-auth-code";
-            SocialLoginParams params = new KakaoLoginParams(code);
-            SocialUserInfo userInfo = new KakaoUserInfo(new KakaoUserInfo.KakaoAccount(
-                    "kakao@auth.com",
-                    new KakaoUserInfo.KakaoAccount.Profile("테스터")
-            ));
+        // when
+        UserContext result = socialLoginService.login(params);
 
-            // given
-            given(socialClientService.request(params)).willReturn(userInfo);
-            given(userRepository.findByEmail("kakao@auth.com")).willReturn(Optional.empty());
-            given(userRepository.save(any(User.class))).willAnswer(i -> i.getArgument(0));
-
-            // when
-            UserContext result = socialLoginService.login(params);
-
-            // then
-            assertEquals("kakao@auth.com", result.getEmail());
-            assertEquals("kakao@auth.com", result.getEmail());
-        }
+        // then
+        assertEquals("kakao@auth.com", result.getEmail());
+        assertEquals("kakao@auth.com", result.getEmail());
     }
 }

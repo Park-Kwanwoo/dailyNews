@@ -3,15 +3,16 @@ package dev.park.dailynews.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import com.github.tomakehurst.wiremock.matching.MultiValuePattern;
-import dev.park.dailynews.domain.social.SocialProvider;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
+import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
-import dev.park.dailynews.repository.RedisSessionRepository;
+import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.repository.RedisTokenRepository;
 import dev.park.dailynews.repository.UserRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +22,10 @@ import wiremock.org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static dev.park.dailynews.domain.social.SocialProvider.KAKAO;
+import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -43,6 +44,9 @@ class SocialLoginControllerTest {
     private final static String MOCK_KAKAO_TOKEN_URL = "/oauth/token";
     private final static String MOCK_KAKAO_USER_INFO_URI = "/v2/user/me";
 
+    private final static String MOCK_NAVER_TOKEN_URL = "/oauth2.0/token";
+    private final static String MOCK_NAVER_USER_INFO_URI = "/v1/nid/me";
+
     private final static String APPLICATION_FORM_URLENCODED_UTF8_VALUE = "application/x-www-form-urlencoded;charset=UTF-8";
 
     @Autowired
@@ -57,84 +61,106 @@ class SocialLoginControllerTest {
     @Autowired
     private RedisTokenRepository tokenRepository;
 
-    @Autowired
-    private RedisSessionRepository sessionRepository;
-
     private InputStream inputStream = InputStream.nullInputStream();
+
 
     @BeforeEach
     void clean() {
         tokenRepository.deleteAll();
-        sessionRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
-    public Map<String, MultiValuePattern> setTokenBody(String code) {
+    @Test
+    @DisplayName("카카오_소셜_로그인_성공")
+    void SUCCESS_KAKAO_SOCIAL_LOGIN() throws Exception {
 
-        Map<String, MultiValuePattern> tokenBody = new HashMap<>();
+        // given
+        inputStream = getClass().getClassLoader().getResourceAsStream("json/kakaoTokenResponse.json");
+        String tokenResponse = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
-        tokenBody.put("grant_type", havingExactly("test-authorization-code"));
-        tokenBody.put("client_id", havingExactly("test-client-id"));
-        tokenBody.put("redirect_uri", havingExactly("http://localhost:80/social/test"));
-        tokenBody.put("client_secret", havingExactly("test-client-secret"));
-        tokenBody.put("code", havingExactly(code));
+        stubFor(WireMock.post(urlEqualTo(MOCK_KAKAO_TOKEN_URL))
+                .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(tokenResponse)
+                )
+        );
 
-        return tokenBody;
+        inputStream = getClass().getClassLoader().getResourceAsStream("json/kakaoUserInfoResponse.json");
+        String userInfoResponse = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+
+
+        stubFor(WireMock.post(urlEqualTo(MOCK_KAKAO_USER_INFO_URI))
+                .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
+                .withHeader(AUTHORIZATION, equalTo("Bearer test-access-token"))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(userInfoResponse)
+                )
+        );
+
+        SocialLoginParams params = new KakaoLoginParams("test-code");
+        String json = objectMapper.writeValueAsString(params);
+        // when
+        mockMvc.perform(post("/social/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        // then
+        User user = userRepository.findByEmail("test@kakao.com")
+                .orElseThrow(UserNotFoundException::new);
+
+        assertEquals("test@kakao.com", user.getEmail());
+        assertEquals("kakao", user.getNickname());
+        assertEquals(KAKAO, user.getProvider());
     }
 
-    @Nested
-    @DisplayName("성공 케이스")
-    class SUCCESS_CASE {
+    @Test
+    @DisplayName("네이버_소셜_로그인_성공")
+    void SUCCESS_NAVER_SOCIAL_LOGIN() throws Exception {
 
-        @Test
-        @DisplayName("소셜 로그인 성공")
-        void SUCCESS_SOCIAL_LOGIN() throws Exception {
+        // given
+        inputStream = getClass().getClassLoader().getResourceAsStream("json/naverTokenResponse.json");
+        String tokenResponse = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        stubFor(WireMock.post(urlEqualTo(MOCK_NAVER_TOKEN_URL))
+                .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(tokenResponse)
+                )
+        );
 
-            // given
-            SocialLoginParams params = new KakaoLoginParams("test-code");
-            String requestBody = objectMapper.writeValueAsString(params);
-            Map<String, MultiValuePattern> tokenBody = setTokenBody(params.getCode());
+        inputStream = getClass().getClassLoader().getResourceAsStream("json/naverUserInfoResponse.json");
+        String userInfoResponse = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        stubFor(WireMock.post(urlEqualTo(MOCK_NAVER_USER_INFO_URI))
+                .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(userInfoResponse)
+                )
+        );
 
-            inputStream = getClass().getClassLoader().getResourceAsStream("json/kakaoTokenResponse.json");
-            String tokenResponse = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        SocialLoginParams params = new NaverLoginParams("test-naver-code", "test-state");
+        String json = objectMapper.writeValueAsString(params);
+        // when
+        mockMvc.perform(post("/social/login")
+                        .content(json)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
 
-            stubFor(WireMock.post(urlEqualTo(MOCK_KAKAO_TOKEN_URL))
-                    .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
-                    .withFormParams(tokenBody)
-                    .willReturn(aResponse()
-                            .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                            .withBody(tokenResponse)));
+        // then
+        User result = userRepository.findByEmail("test@naver.com")
+                .orElseThrow(UserNotFoundException::new);
 
-            inputStream = getClass().getClassLoader().getResourceAsStream("json/kakaoUserInfoResponse.json");
-            String userInfoResponse = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-
-            Map<String, MultiValuePattern> userInfoBody = new HashMap<>();
-            userInfoBody.put("property_keys", havingExactly("[\"kakao_account.email\", \"kakao_account.profile.nickname\"]"));
-
-            stubFor(WireMock.post(urlEqualTo(MOCK_KAKAO_USER_INFO_URI))
-                    .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
-                    .withHeader(AUTHORIZATION, equalTo("Bearer test-access-token"))
-                    .withFormParams(userInfoBody)
-                    .willReturn(
-                            aResponse()
-                                    .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                                    .withBody(userInfoResponse)
-                    )
-            );
-
-            // when
-            mockMvc.perform(post("/login/kakao")
-                            .contentType(APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isOk())
-                    .andDo(print());
-
-            // then
-            User user = userRepository.findByEmail("dailyNews@kakao.com")
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
-
-            assertEquals("dailyNews@kakao.com", user.getEmail());
-            assertEquals("테스터", user.getNickname());
-            assertEquals(SocialProvider.KAKAO, user.getProvider());
-        }
+        assertEquals("test@naver.com", result.getEmail());
+        assertEquals("naver", result.getNickname());
+        assertEquals(NAVER, result.getProvider());
     }
 }

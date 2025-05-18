@@ -18,3 +18,25 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: create
+
+jwt:
+  secret-key: nPh3iuhnHeBZxXi2Z4IyYlz0AfpHS93ozj+Ph70pPIJaNj+bHcv8E5CnQC5YjAs5XD8dh26N8A8P8Cb3F5EO6g==
+  access-expiration-time: 3600
+  refresh-expiration-time: 86400
+  issuer: dailyNews
+
+
+social:
+  kakao:
+    grant-type: test-authorization-code
+    client-id: test-client-id
+    client-secret: test-client-secret
+    redirect-uri: http://localhost:80/social/test
+    token-url: http://localhost:80/oauth/token
+    user-info-url: http://localhost:80/v2/user/me
+  naver:
+    grant-type: test-authorization_code
+    client-id: test-client-id
+    client-secret: test-client-secret
+    token-url: http://localhost:80/oauth2.0/token
+    user-info-url: http://localhost:80/v1/nid/me
