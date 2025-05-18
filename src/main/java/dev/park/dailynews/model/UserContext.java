@@ -1,15 +1,14 @@
 package dev.park.dailynews.model;
 
+import dev.park.dailynews.domain.user.AuthToken;
 import dev.park.dailynews.domain.user.User;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class UserContext {
 
     private final String email;
@@ -18,5 +17,9 @@ public class UserContext {
     public UserContext(User user) {
         this.email = user.getEmail();
         this.uuid = UUID.randomUUID().toString();
+    }
+
+    public static UserContext from(AuthToken token) {
+        return new UserContext(token.getEmail(), token.getUuid());
     }
 }
