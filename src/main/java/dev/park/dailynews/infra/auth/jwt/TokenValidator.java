@@ -32,7 +32,7 @@ public class TokenValidator {
         String uuid = jwtUtils.extractUUID(token);
         String email = jwtUtils.extractSubject(token);
         String issuer = jwtUtils.extractIssuer(token);
-        TokenContext savedToken = tokenService.get(uuid);
+        TokenContext savedToken = tokenService.getToken(uuid);
 
         return savedToken.getIp().equals(session.getIp()) &&
                 savedToken.getUserAgent().equals(session.getUserAgent()) &&
