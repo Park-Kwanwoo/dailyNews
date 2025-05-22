@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public record NaverUserInfo(Response response) implements SocialUserInfo {
 
     @JsonIgnoreProperties
-    record Response(String email, String nickname) {
+    public record Response(String email, String nickname) {
     }
     @Override
     public SocialProvider getProvider() {
