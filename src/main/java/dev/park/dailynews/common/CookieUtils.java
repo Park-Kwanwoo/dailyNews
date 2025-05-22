@@ -40,7 +40,7 @@ public class CookieUtils {
         String cookieValue = Arrays.stream(cookies)
                 .filter(c -> c.getName().equals(value))
                 .findFirst()
-                .map(c -> new String(c.getValue()))
+                .map(Cookie::getValue)
                 .orElseThrow(NullPointerException::new);
 
         return cookieValue;
