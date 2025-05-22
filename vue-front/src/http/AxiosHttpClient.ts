@@ -1,7 +1,8 @@
-import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosError, AxiosInstance, AxiosRequestHeaders, AxiosResponse } from 'axios'
 import axios from 'axios'
 import HttpError from '@/http/HttpError.ts'
 import { singleton } from 'tsyringe'
+import { useAuthStore } from '@/store/useAuthStore.ts'
 
 export type HttpRequestConfig = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
@@ -9,7 +10,7 @@ export type HttpRequestConfig = {
   params?: any
   body?: any
   headers?: {
-    Authorization?: string
+    Authorization?: string | null
   }
 }
 
@@ -21,6 +22,10 @@ export default class AxiosHttpClient {
     withCredentials: true,
   })
 
+  constructor() {
+    this.setInterceptor()
+  }
+
   public request(config: HttpRequestConfig) {
     return this.client
       .request({
@@ -28,6 +33,7 @@ export default class AxiosHttpClient {
         url: config.path,
         params: config.params,
         data: config.body,
+        headers: config.headers,
       })
       .then((r: AxiosResponse) => {
         return r
@@ -35,5 +41,36 @@ export default class AxiosHttpClient {
       .catch((e: AxiosError) => {
         return Promise.reject(new HttpError(e))
       })
+  }
+
+  public setInterceptor() {
+    this.client.interceptors.response.use((r: AxiosResponse) => {
+      if (r.data.message == 'expired_accessToken') {
+        this.reissueToken()
+      }
+      return r
+    })
+  }
+
+  public getToken() {
+    this.request({
+      path: '/api/token',
+      method: 'GET',
+    }).then((r) => {
+      return r
+    })
+  }
+
+  public reissueToken() {
+    const auth = useAuthStore()
+
+    this.request({
+      path: '/api/token/reissue',
+      method: 'GET',
+    }).then((r) => {
+      const accessToken = r.headers['authorization']
+      auth.setToken(accessToken)
+      return r
+    })
   }
 }
