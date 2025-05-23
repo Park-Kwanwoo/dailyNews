@@ -1,9 +1,19 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAuthStore } from '@/store/useAuthStore.ts'
+import { computed } from 'vue'
+
+const authStore = useAuthStore()
+const isLoggedIn = computed(() => authStore.isLoggedIn())
+
+function logout() {
+  authStore.logout()
+}
+</script>
 
 <template>
   <ul class="menus">
     <li class="menu">
-      <router-link to="/login">로그인</router-link>
+      <router-link to="/" v-if="isLoggedIn" @click="logout">로그아웃</router-link>
     </li>
   </ul>
 </template>

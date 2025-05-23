@@ -33,20 +33,16 @@ onMounted(() => {
     states.loginParams.state = state
     states.loginParams.code = code
     states.loginParams.provider = 'NAVER'
-    naverLogin(states.loginParams)
+    login(states.loginParams)
   } else if (code) {
     states.loginParams.code = code
     states.loginParams.provider = 'KAKAO'
-    kakaoLogin(states.loginParams)
+    login(states.loginParams)
   }
 })
 
-function kakaoLogin(params: LoginParams) {
-  SOCIAL_LOGIN_REPOSITORY.kakaoLogin(params)
-}
-
-function naverLogin(params: LoginParams) {
-  SOCIAL_LOGIN_REPOSITORY.naverLogin(params)
+function login(params: LoginParams) {
+  SOCIAL_LOGIN_REPOSITORY.login(params)
 }
 </script>
 
