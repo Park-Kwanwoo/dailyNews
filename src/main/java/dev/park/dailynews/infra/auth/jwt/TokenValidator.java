@@ -21,7 +21,7 @@ public class TokenValidator {
         try {
             return this.isTokenInfoMatch(accessToken, session);
         } catch (ExpiredJwtException e) {
-            throw new ExpiredTokenException();
+            throw new ExpiredTokenException("expired_accessToken");
         } catch (JwtException e) {
             throw new InvalidTokenException();
         }
@@ -32,7 +32,7 @@ public class TokenValidator {
         String uuid = jwtUtils.extractUUID(token);
         String email = jwtUtils.extractSubject(token);
         String issuer = jwtUtils.extractIssuer(token);
-        TokenContext savedToken = tokenService.getToken(uuid);
+        TokenContext savedToken = tokenService.getTokenByUUID(uuid);
 
         return savedToken.getIp().equals(session.getIp()) &&
                 savedToken.getUserAgent().equals(session.getUserAgent()) &&

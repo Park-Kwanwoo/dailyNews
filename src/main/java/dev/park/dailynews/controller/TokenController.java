@@ -1,8 +1,8 @@
 package dev.park.dailynews.controller;
 
 import dev.park.dailynews.common.CookieUtils;
-import dev.park.dailynews.dto.response.ApiResponse;
-import dev.park.dailynews.dto.response.TokenResponse;
+import dev.park.dailynews.dto.response.common.ApiResponse;
+import dev.park.dailynews.dto.response.token.TokenResponse;
 import dev.park.dailynews.model.SessionContext;
 import dev.park.dailynews.model.TokenContext;
 import dev.park.dailynews.service.TokenService;
@@ -21,7 +21,7 @@ public class TokenController {
     private final TokenService tokenService;
 
     @GetMapping("/token/reissue")
-    public ResponseEntity<ApiResponse<Void>> reissueToken(HttpServletRequest request,
+    public ApiResponse<Void> reissueToken(HttpServletRequest request,
                                                           HttpServletResponse response,
                                                           SessionContext session) {
 
@@ -30,18 +30,17 @@ public class TokenController {
         CookieUtils.setAuthorization(response, reissuedToken.getAccessToken());
         CookieUtils.setCookie(response, reissuedToken.getRefreshToken());
 
-        return new ResponseEntity<>(ApiResponse.successWithNoContent(), HttpStatus.OK);
+        return ApiResponse.successWithNoContent();
     }
 
     @GetMapping("/token")
-    public ResponseEntity<ApiResponse<Void>> getToken(HttpServletRequest request,
-                                                      HttpServletResponse response,
-                                                      SessionContext session) {
+    public ApiResponse<Void> getToken(HttpServletRequest request,
+                                                      HttpServletResponse response) {
         String refreshToken = CookieUtils.extractCookieValue("refreshToken", request);
-        TokenContext token = tokenService.getTokenByRefreshToken(refreshToken, session);
+        TokenContext token = tokenService.getTokenByRefreshToken(refreshToken);
         CookieUtils.setAuthorization(response, token.getAccessToken());
         CookieUtils.setCookie(response, token.getRefreshToken());
-        return new ResponseEntity<>(ApiResponse.successWithNoContent(), HttpStatus.OK);
+        return ApiResponse.successWithNoContent();
 
     }
 }

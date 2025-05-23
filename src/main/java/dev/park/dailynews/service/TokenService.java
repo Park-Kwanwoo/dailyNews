@@ -1,8 +1,9 @@
 package dev.park.dailynews.service;
 
 import dev.park.dailynews.domain.user.AuthToken;
-import dev.park.dailynews.dto.response.TokenResponse;
+import dev.park.dailynews.dto.response.token.TokenResponse;
 import dev.park.dailynews.exception.ExpiredTokenException;
+import dev.park.dailynews.exception.InvalidSessionInfo;
 import dev.park.dailynews.exception.TokenNotFoundException;
 import dev.park.dailynews.exception.UnAuthorized;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
@@ -47,7 +48,7 @@ public class TokenService {
         return redisTokenRepository.save(authToken);
     }
 
-    public TokenContext getToken(String uuid) {
+    public TokenContext getTokenByUUID(String uuid) {
 
         AuthToken savedToken = redisTokenRepository.findByUuid(uuid)
                 .orElseThrow(TokenNotFoundException::new);
@@ -61,7 +62,7 @@ public class TokenService {
                 .build();
     }
 
-    public TokenResponse reissueToken(String refreshToken, SessionContext sessionContext) {
+    public TokenResponse reissueToken(String refreshToken, SessionContext session) {
 
         try {
             String uuid = jwtUtils.extractUUID(refreshToken);
@@ -70,12 +71,37 @@ public class TokenService {
 
             UserContext userContext = UserContext.from(savedToken);
 
-            AuthToken reissuedToken = createToken(userContext, sessionContext);
+            if (!session.getIp().equals(savedToken.getIp()) ||
+                 !session.getUserAgent().equals(savedToken.getUserAgent()))
+                throw new InvalidSessionInfo();
 
+            AuthToken reissuedToken = createToken(userContext, session);
             return TokenResponse.from(reissuedToken);
 
         } catch (ExpiredJwtException e) {
-            throw new ExpiredTokenException();
+            throw new ExpiredTokenException("expired_refreshToken");
+        } catch (JwtException e) {
+            throw new UnAuthorized();
+        }
+    }
+
+    public TokenContext getTokenByRefreshToken(String refreshToken) {
+
+        try {
+            String uuid = jwtUtils.extractUUID(refreshToken);
+            AuthToken savedToken = redisTokenRepository.findByUuid(uuid)
+                    .orElseThrow(TokenNotFoundException::new);
+
+            return TokenContext.builder()
+                    .email(savedToken.getEmail())
+                    .accessToken(savedToken.getAccessToken())
+                    .refreshToken(savedToken.getRefreshToken())
+                    .ip(savedToken.getIp())
+                    .userAgent(savedToken.getUserAgent())
+                    .build();
+
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredTokenException("expired_refreshToken");
         } catch (JwtException e) {
             throw new UnAuthorized();
         }
