@@ -3,28 +3,15 @@ import { inject, singleton } from 'tsyringe'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
 import LoginParams from '@/request/LoginParams.ts'
+import { useAuthStore } from '@/store/useAuthStore.ts'
 
 @singleton()
 export default class SocialLoginRepository {
   constructor(@inject(HttpRepository) private readonly httpRepository: HttpRepository) {}
 
-  public naverLogin(req: LoginParams) {
-    return this.httpRepository
-      .login({
-        path: '/api/social/login',
-        body: req,
-        method: 'POST',
-      })
-      .then((r) => {
-        router.replace('/')
-      })
-      .catch((e) => {
-        ElMessage.error(e.message)
-        router.replace('/login')
-      })
-  }
+  public login(req: LoginParams) {
+    const auth = useAuthStore()
 
-  public kakaoLogin(req: LoginParams) {
     return this.httpRepository
       .login({
         path: '/api/social/login',
@@ -32,11 +19,13 @@ export default class SocialLoginRepository {
         method: 'POST',
       })
       .then((r) => {
-        router.replace('/')
+        const accessToken = r.headers['authorization']
+        auth.setToken(accessToken)
+        router.replace('/main')
       })
       .catch((e) => {
         ElMessage.error(e.message)
-        router.replace('/login')
+        router.replace('/')
       })
   }
 }
