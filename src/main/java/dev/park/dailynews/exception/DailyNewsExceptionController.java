@@ -1,6 +1,6 @@
 package dev.park.dailynews.exception;
 
-import dev.park.dailynews.dto.response.ApiResponse;
+import dev.park.dailynews.dto.response.common.ApiResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

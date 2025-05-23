@@ -1,10 +1,8 @@
 package dev.park.dailynews.controller;
 
 import dev.park.dailynews.common.CookieUtils;
-import dev.park.dailynews.dto.response.ApiResponse;
-import dev.park.dailynews.dto.response.TokenResponse;
-import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
-import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
+import dev.park.dailynews.dto.response.common.ApiResponse;
+import dev.park.dailynews.dto.response.token.TokenResponse;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.model.SessionContext;
 import dev.park.dailynews.model.UserContext;
