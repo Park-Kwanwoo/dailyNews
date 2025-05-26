@@ -1,4 +1,4 @@
-package dev.park.dailynews.repository;
+package dev.park.dailynews.repository.subject;
 
 import dev.park.dailynews.domain.news.Subject;
 

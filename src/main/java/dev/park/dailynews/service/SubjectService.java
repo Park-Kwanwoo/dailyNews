@@ -6,8 +6,8 @@ import dev.park.dailynews.dto.request.SubjectRequest;
 import dev.park.dailynews.dto.response.anthropic.SubjectResponse;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.model.LoginUserContext;
-import dev.park.dailynews.repository.SubjectRepository;
-import dev.park.dailynews.repository.UserRepository;
+import dev.park.dailynews.repository.subject.SubjectRepository;
+import dev.park.dailynews.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +33,7 @@ public class SubjectService {
 
     public void save(SubjectRequest subjectRequest, LoginUserContext user) {
 
-        User savedUser = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(UserNotFoundException::new);
+        User savedUser = userRepository.findByEmailWithSubjectLeftJoin(user.getEmail());
 
         Subject subject = Subject.builder()
                 .keyword(subjectRequest.getKeyword())
@@ -55,9 +54,7 @@ public class SubjectService {
 
     public SubjectResponse getSubject(LoginUserContext user) {
 
-        Subject subject = subjectRepository.findSubjectByUserEmail(user.getEmail())
-                .orElseGet(() -> new Subject(""));
-
-        return SubjectResponse.from(subject.getKeyword());
+        Subject subject = subjectRepository.findByUserEmail(user.getEmail());
+        return subject == null ? new SubjectResponse("") : SubjectResponse.from(subject.getKeyword());
     }
 }

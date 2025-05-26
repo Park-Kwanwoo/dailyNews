@@ -1,4 +1,4 @@
-package dev.park.dailynews.repository;
+package dev.park.dailynews.repository.subject;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dev.park.dailynews.domain.news.Subject;

@@ -4,6 +4,7 @@ import dev.park.dailynews.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -20,8 +21,8 @@ public class Subject {
 
     private String keyword;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "email", referencedColumnName = "email")
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "user_email", referencedColumnName = "email")
     private User user;
 
     @Builder
@@ -31,6 +32,7 @@ public class Subject {
 
     public void setUser(User user) {
         this.user = user;
+        user.setSubject(this);
     }
 
     public void changeKeyword(String keyword) {
