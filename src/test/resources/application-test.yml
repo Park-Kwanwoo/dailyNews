@@ -15,14 +15,17 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
+    defer-datasource-initialization: true
 
+  sql:
+    init:
+      mode: always
 jwt:
   secret-key: nPh3iuhnHeBZxXi2Z4IyYlz0AfpHS93ozj+Ph70pPIJaNj+bHcv8E5CnQC5YjAs5XD8dh26N8A8P8Cb3F5EO6g==
-  access-expiration-time: 3600
-  refresh-expiration-time: 86400
+  access-expiration-time: 1500
+  refresh-expiration-time: 2500
   issuer: dailyNews
 
 
