@@ -3,13 +3,14 @@ package dev.park.dailynews.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import dev.park.dailynews.config.DailyTest;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
 import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.repository.RedisTokenRepository;
-import dev.park.dailynews.repository.UserRepository;
+import dev.park.dailynews.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,12 +34,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+
+@DailyTest
 @WireMockTest(httpPort = 80)
-@ActiveProfiles("test")
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class SocialLoginControllerTest {
 
     private final static String MOCK_KAKAO_TOKEN_URL = "/oauth/token";
@@ -63,11 +66,9 @@ class SocialLoginControllerTest {
 
     private InputStream inputStream = InputStream.nullInputStream();
 
-
     @BeforeEach
     void clean() {
         tokenRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
     @Test
@@ -148,6 +149,7 @@ class SocialLoginControllerTest {
 
         SocialLoginParams params = new NaverLoginParams("test-naver-code", "test-state");
         String json = objectMapper.writeValueAsString(params);
+
         // when
         mockMvc.perform(post("/social/login")
                         .content(json)
@@ -162,5 +164,29 @@ class SocialLoginControllerTest {
         assertEquals("test@naver.com", result.getEmail());
         assertEquals("naver", result.getNickname());
         assertEquals(NAVER, result.getProvider());
+    }
+
+    @Test
+    @DisplayName("외부_서버_Connection_Timeout_시_예외_발생")
+    void THROW_EXCEPTION_WHEN_3RD_PARTY_CONNECTION_TIMEOUT() throws Exception {
+
+        // given
+        stubFor(WireMock.post(urlEqualTo(MOCK_KAKAO_TOKEN_URL))
+                .withHeader(CONTENT_TYPE, equalTo(APPLICATION_FORM_URLENCODED_UTF8_VALUE))
+                .willReturn(
+                        aResponse()
+                                .withStatus(500)
+                                .withFixedDelay(3000)
+                )
+        );
+
+        SocialLoginParams params = new KakaoLoginParams("test-code");
+        String json = objectMapper.writeValueAsString(params);
+
+        // expected
+        mockMvc.perform(post("/social/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andDo(print());
     }
 }
