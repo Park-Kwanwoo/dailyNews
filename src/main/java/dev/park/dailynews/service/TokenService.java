@@ -3,7 +3,7 @@ package dev.park.dailynews.service;
 import dev.park.dailynews.domain.user.AuthToken;
 import dev.park.dailynews.dto.response.token.TokenResponse;
 import dev.park.dailynews.exception.ExpiredTokenException;
-import dev.park.dailynews.exception.InvalidSessionInfo;
+import dev.park.dailynews.exception.InvalidSessionInfoException;
 import dev.park.dailynews.exception.TokenNotFoundException;
 import dev.park.dailynews.exception.UnAuthorized;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
@@ -73,7 +73,7 @@ public class TokenService {
 
             if (!session.getIp().equals(savedToken.getIp()) ||
                  !session.getUserAgent().equals(savedToken.getUserAgent()))
-                throw new InvalidSessionInfo();
+                throw new InvalidSessionInfoException();
 
             AuthToken reissuedToken = createToken(userContext, session);
             return TokenResponse.from(reissuedToken);

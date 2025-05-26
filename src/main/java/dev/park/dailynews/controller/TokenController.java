@@ -9,19 +9,17 @@ import dev.park.dailynews.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class TokenController {
 
     private final TokenService tokenService;
 
     @GetMapping("/token/reissue")
-    public ApiResponse<Void> reissueToken(HttpServletRequest request,
+    public ApiResponse<?> reissueToken(HttpServletRequest request,
                                                           HttpServletResponse response,
                                                           SessionContext session) {
 
@@ -31,6 +29,7 @@ public class TokenController {
         CookieUtils.setCookie(response, reissuedToken.getRefreshToken());
 
         return ApiResponse.successWithNoContent();
+
     }
 
     @GetMapping("/token")
