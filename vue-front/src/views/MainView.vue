@@ -3,7 +3,7 @@ import { onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/store/useAuthStore'
 import { container } from 'tsyringe'
 import SubjectRepository from '@/repository/SubjectRepository.ts'
-import Subject from '@/request/Subject'
+import Subject from '@/entity/Subject.ts'
 
 type StateType = {
   subject: Subject
