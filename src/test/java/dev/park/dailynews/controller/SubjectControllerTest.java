@@ -1,9 +1,8 @@
 package dev.park.dailynews.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.park.dailynews.config.CustomTestExecutionListener;
 import dev.park.dailynews.config.DailyTest;
-import dev.park.dailynews.domain.news.Subject;
+import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.AuthToken;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.request.SubjectRequest;
@@ -19,9 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
