@@ -1,6 +1,6 @@
 package dev.park.dailynews.repository.subject;
 
-import dev.park.dailynews.domain.news.Subject;
+import dev.park.dailynews.domain.subject.Subject;
 
 public interface SubjectRepositoryCustom {
 

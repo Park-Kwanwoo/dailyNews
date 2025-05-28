@@ -1,10 +1,10 @@
 package dev.park.dailynews.repository.subject;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import dev.park.dailynews.domain.news.Subject;
+import dev.park.dailynews.domain.subject.Subject;
 import lombok.RequiredArgsConstructor;
 
-import static dev.park.dailynews.domain.news.QSubject.subject;
+import static dev.park.dailynews.domain.subject.QSubject.subject;
 import static dev.park.dailynews.domain.user.QUser.user;
 
 @RequiredArgsConstructor
