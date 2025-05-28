@@ -40,6 +40,6 @@ public class News {
 
     public void setUser(User user) {
         this.user = user;
-        user.addNews(this);
+        user.getNews().add(this);
     }
 }
