@@ -1,8 +1,8 @@
 package dev.park.dailynews.controller;
 
 import dev.park.dailynews.dto.request.SubjectRequest;
-import dev.park.dailynews.dto.response.anthropic.SubjectResponse;
 import dev.park.dailynews.dto.response.common.ApiResponse;
+import dev.park.dailynews.dto.response.subject.SubjectResponse;
 import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.service.SubjectService;
 import lombok.RequiredArgsConstructor;
