@@ -1,4 +1,4 @@
-package dev.park.dailynews.domain.news;
+package dev.park.dailynews.domain.subject;
 
 import dev.park.dailynews.domain.user.User;
 import jakarta.persistence.*;
