@@ -15,7 +15,8 @@ import java.util.List;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final TokenInterceptor tokenInterceptor;
-    private final RequestInfoResolver requestInfoResolver;
+    private final SessionInfoResolver sessionInfoResolver;
+    private final UserInfoResolver userInfoResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -27,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(requestInfoResolver);
+        resolvers.addAll(resolvers());
     }
 
     @Override
@@ -38,5 +39,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedMethods("*")
                 .exposedHeaders("Authorization")
                 .allowCredentials(true);
+    }
+
+    private List<HandlerMethodArgumentResolver> resolvers() {
+        return List.of(sessionInfoResolver, userInfoResolver);
     }
 }
