@@ -2,12 +2,14 @@ package dev.park.dailynews.domain.news;
 
 import dev.park.dailynews.domain.user.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -22,7 +24,7 @@ public class News {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, fetch = LAZY)
     private List<NewsItem> newsItems = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

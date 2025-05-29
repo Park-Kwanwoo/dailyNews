@@ -41,6 +41,7 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
         return jpqlQueryFactory.select(news)
                 .from(news)
                 .innerJoin(news.newsItems, newsItem)
+                .fetchJoin()
                 .where(news.id.eq(id))
                 .fetchFirst();
     }
