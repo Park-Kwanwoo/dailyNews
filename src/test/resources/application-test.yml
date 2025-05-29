@@ -43,3 +43,7 @@ social:
     client-secret: test-client-secret
     token-url: http://localhost:80/oauth2.0/token
     user-info-url: http://localhost:80/v1/nid/me
+
+openai:
+  openai-key: test-openai-key
+  openai-response-url: http://localhost:80/v1/responses
