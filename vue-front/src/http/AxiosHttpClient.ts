@@ -43,7 +43,7 @@ export default class AxiosHttpClient {
       })
   }
 
-  public setInterceptor() {
+  private setInterceptor() {
     this.client.interceptors.response.use((r: AxiosResponse) => {
       if (r.data.message == 'expired_accessToken') {
         this.reissueToken()
@@ -52,16 +52,7 @@ export default class AxiosHttpClient {
     })
   }
 
-  public getToken() {
-    this.request({
-      path: '/api/token',
-      method: 'GET',
-    }).then((r) => {
-      return r
-    })
-  }
-
-  public reissueToken() {
+  private reissueToken() {
     const auth = useAuthStore()
 
     this.request({

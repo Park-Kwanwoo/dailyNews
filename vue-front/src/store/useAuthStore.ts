@@ -8,7 +8,6 @@ export const useAuthStore = defineStore('auth', () => {
   // actions
   function setToken(token: string) {
     accessToken.value = token
-    localStorage.setItem('loggedIn', '1')
   }
 
   function isLoggedIn() {
