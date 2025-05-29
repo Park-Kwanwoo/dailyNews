@@ -51,3 +51,7 @@ http/
 
 ### test ###
 src/test/resources/json/**
+src/test/resources/data.sql
+
+## .json
+src/main/resources/OpenAI.json
