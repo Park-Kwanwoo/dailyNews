@@ -1,4 +1,4 @@
-name: Appliation CI
+name: Application CI
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,8 +17,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
