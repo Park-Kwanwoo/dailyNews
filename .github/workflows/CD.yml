@@ -3,7 +3,7 @@ name: Appliation CI
 on:
   push:
     branches:
-      - develop
+      - dev
 
 
 jobs:
