@@ -23,8 +23,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
-      - run: | 
+      - run: |
             cd vue-front
+            npm ci
             npm run build
             mv dist/* ../src/main/resources/static
 
