@@ -1,9 +1,11 @@
 HELP.md
 .gradle
 build/
+src/main/generated
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+src/main/resources/static/**
 
 ### STS ###
 .apt_generated
@@ -38,9 +40,11 @@ out/
 
 ### Private ###
 src/main/resources/application-dev.yml
+src/main/resources/application-prod-db.yml.yml
+src/main/resources/application-key.yml.yml
+
 dailyNews.*
-docker-compose.yml
-Dockerfile
+docker-compose-dev.yml
 nodeenv-22
 
 ### redis ###
