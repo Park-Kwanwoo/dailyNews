@@ -21,13 +21,12 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
+          cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
-
-      - run: |
-          cd vue-front
-          npm run build
-#          mv dist/* ../src/main/resources/static
+      - run: | 
+            cd vue-front
+            npm run build
+            mv dist/* ../src/main/resources/static
 
 #      ## JDK 셋업
 #      - name: Set up JDK 17
