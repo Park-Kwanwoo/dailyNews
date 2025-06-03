@@ -26,9 +26,7 @@ jobs:
 
       - run: |
           cd vue-front
-          pwd
-          ls -al
-#          npm run build
+          npm run build
 #          mv dist/* ../src/main/resources/static
 
 #      ## JDK 셋업
