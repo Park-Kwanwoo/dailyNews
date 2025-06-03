@@ -7,6 +7,7 @@ import LoginParams from '@/request/LoginParams.ts'
 
 const SOCIAL_LOGIN_REPOSITORY = container.resolve(SocialLoginRepository)
 const { socialEnv } = useSocialEnv()
+const redirect_uri = window.location.origin
 
 type StateType = {
   loginParams: LoginParams
@@ -17,11 +18,11 @@ const states = reactive<StateType>({
 })
 
 function redirectToKakaoLogin() {
-  window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${socialEnv.kakao_rest_api_key}&redirect_uri=${socialEnv.redirect_uri}&response_type=code`
+  window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${socialEnv.kakao_rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`
 }
 
 function redirectToNaverLogin() {
-  window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${socialEnv.naver_client_id}&redirect_uri=${socialEnv.redirect_uri}&state=test`
+  window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${socialEnv.naver_client_id}&redirect_uri=${redirect_uri}&state=test`
 }
 
 onMounted(() => {
@@ -53,12 +54,12 @@ function login(params: LoginParams) {
     </div>
     <div class="kakao_btn_div">
       <button class="kakao_login_btn d-flex justify-content-center" @click="redirectToKakaoLogin()">
-        <img src="/kakao_login.png" alt="kakao_login" class="kakao_login_img" />
+        <img src="/images/kakao_login.png" alt="kakao_login" class="kakao_login_img" />
       </button>
     </div>
     <div class="naver_btn_div">
       <button class="naver_login_btn" @click="redirectToNaverLogin()">
-        <img src="/naver_login.png" alt="naver_login" class="naver_login_img" />
+        <img src="/images/naver_login.png" alt="naver_login" class="naver_login_img" />
       </button>
     </div>
   </div>
