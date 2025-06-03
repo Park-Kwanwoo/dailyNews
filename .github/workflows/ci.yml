@@ -24,9 +24,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
       - run: |
-#            cd vue-front
-#            npm ci
-#            npm run build
+            cd vue-front
+            npm ci
+            npm run build
+            cd ..
             ls -al
 
 #      ## JDK 셋업
