@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [ 22.x ]
 
     steps:
       ## 레포지토리의 특정 브랜치, 커밋을 가져오는 설정
@@ -24,14 +24,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
 
+      ## vue 프로젝트 의존성 설치
       - name: Install dependencies
         run: npm --prefix vue-front ci
 
+      ## vue 프로젝트 빌드 및 빌드 파일 옮기기
       - name: Build And Move Vue project
         run: |
-            npm --prefix vue-front run build
-            mkdir -p src/main/resources/static
-            mv vue-front/dist/* src/main/resources/static
+          npm --prefix vue-front run build
+          mkdir -p src/main/resources/static
+          mv vue-front/dist/* src/main/resources/static
+
+      ## YML 설정 파일 생성
+      - name: Set Secret yml
+        run: |
+          echo ${{ secrets.APPLICATION_DB_YML }} | base64 --decode >> src/main/resources/application-prod-db.yml
+          echo ${{ secrets.APPLICATION_DB_YML }} | base64 --decode >> src/main/resources/application-key.yml
 
       ## JDK 셋업
       - name: Set up JDK 17
@@ -40,10 +48,33 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      ## Gradle 셋업
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle
+      ## Gradle 빌드에 필요한 데이터를 캐싱하여 빌드 속도를 향상
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hasFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      ## Gradle 권한 부여
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      ## 프로젝트 빌드
+      - name: Build Application
+        run: ./gradlew build
+
+      ## docker 이미지로 빌드
+      - name: Docker Build and push Docker Images
         run: |
-              pwd
-              ls -al
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker build -t dailynews:latest .
+          sudo tag dailynews pgw4712/dailynews:latest
+          sudo docker push pgw4712/dailynews:latest
+      
