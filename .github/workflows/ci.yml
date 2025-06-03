@@ -23,23 +23,27 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
-      - run: |
-            cd vue-front
-            npm ci
-            npm run build
-            mv dist/* /src/main/resources/static
 
-#      ## JDK 셋업
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v4
-#        with:
-#          java-version: '17'
-#          distribution: 'temurin'
-#
-#      - name: Setup Gradle
-#        uses: gradle/actions/setup-gradle@v4
-#
-#      - name: Build with Gradle
-#        run: |
-#              pwd
-#              ls -al
+      - name: Install dependencies
+        run: npm --prefix vue-front ci
+
+      - name: Build And Move Vue project
+        run: |
+            npm --prefix vue-front run build
+            mkdir -p src/main/resources/static
+            mv vue-front/dist/* src/main/resources/static
+
+      ## JDK 셋업
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle
+        run: |
+              pwd
+              ls -al
