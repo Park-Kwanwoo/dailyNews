@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+          cache-dependency-path: ./vue-front/package-lock.json
 
       - run: |
           ls -al
