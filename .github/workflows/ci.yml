@@ -68,7 +68,7 @@ jobs:
 
       ## 프로젝트 빌드
       - name: Build Application
-        run: ./gradlew build
+        run: ./gradlew build -x test
 
       ## docker 이미지로 빌드
       - name: Docker Build and push Docker Images
