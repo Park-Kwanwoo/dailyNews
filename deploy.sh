@@ -14,5 +14,5 @@ else
   exit 1
 fi
 
-echo $EC2_IP
-echo $EC2_SECRET
+ssh -i ~/.ssh/dailynews.pem ec2-user@$EC2_IP
+mkdir success
