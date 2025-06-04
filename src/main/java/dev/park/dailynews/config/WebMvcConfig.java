@@ -21,11 +21,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor)
+                .excludePathPatterns("/**")
                 .excludePathPatterns("/token/reissue")
                 .excludePathPatterns("/social/login")
                 .excludePathPatterns("/error");
     }
-
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.addAll(resolvers());
@@ -34,7 +34,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
+                .allowedOrigins("http://54.180.42.38")
                 .allowedHeaders("*")
                 .allowedMethods("*")
                 .exposedHeaders("Authorization")

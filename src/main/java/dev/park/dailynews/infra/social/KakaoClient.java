@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class KakaoClient implements SocialClient {

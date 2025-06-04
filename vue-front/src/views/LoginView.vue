@@ -30,10 +30,6 @@ onMounted(() => {
   const code = query.get('code')
   const state = query.get('state')
 
-  console.log('====================')
-  console.log(redirect_uri)
-  console.log('====================')
-
   if (code && state) {
     states.loginParams.state = state
     states.loginParams.code = code

@@ -25,7 +25,7 @@ else
   WAS_STOP_PORT=8081
 fi
 
-docker run -d --network common-network -p $WAS_RUN_PORT:8080 --name $RUN_TARGET pgw4712/dailynews:latest
+docker run -d --network ec2-user_network -p $WAS_RUN_PORT:8080 --name $RUN_TARGET pgw4712/dailynews:latest
 docker logout
 
 sleep 10
