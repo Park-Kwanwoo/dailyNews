@@ -13,3 +13,4 @@ spring:
     include:
       - prod-db
       - key
+    active: prod-db, key
