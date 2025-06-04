@@ -12,12 +12,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Docker test
+        run: docker ps
+
       - name: Actions Test
         run: |
           rm -rf ./.env
           touch ./.env
           echo EC2_IP=${{ secrets.EC2_IP }} >> .env
-          echo EC2_SECRET=${{ secrets.EC2_SECRET }} | base64 --decode >> .env
+          echo EC2_SECRET=${{ secrets.EC2_SECRET }} >> .env
           chmod +x deploy.sh
           ./deploy.sh
 
