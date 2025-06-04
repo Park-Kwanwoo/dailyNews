@@ -38,7 +38,7 @@ jobs:
       - name: Set Secret yml
         run: |
           echo ${{ secrets.APPLICATION_DB_YML }} | base64 --decode >> src/main/resources/application-prod-db.yml
-          echo ${{ secrets.APPLICATION_DB_YML }} | base64 --decode >> src/main/resources/application-key.yml
+          echo ${{ secrets.APPLICATION_KEY_YML }} | base64 --decode >> src/main/resources/application-prod-key.yml
 
       ## JDK 셋업
       - name: Set up JDK 17
@@ -72,11 +72,11 @@ jobs:
       ## docker 이미지로 빌드
       - name: Docker Build and push Docker Images
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          sudo docker build -t dailynews:latest --platform linux/amd64 .
-          sudo docker tag dailynews pgw4712/dailynews:latest
-          sudo docker push pgw4712/dailynews:latest
-          sudo docker logout
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker build -t dailynews:latest --platform linux/amd64 .
+          docker tag dailynews pgw4712/dailynews:latest
+          docker push pgw4712/dailynews:latest
+          docker logout
 
       ## deploy.sh로 ec2 docker 프로세스 실행
       - name: Execute deploy.sh

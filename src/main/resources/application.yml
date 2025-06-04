@@ -12,5 +12,5 @@ spring:
   profiles:
     include:
       - prod-db
-      - key
-    active: prod-db, key
+      - prod-key
+    active: prod-db, prod-key
