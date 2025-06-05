@@ -7,7 +7,7 @@ import LoginParams from '@/request/LoginParams.ts'
 
 const SOCIAL_LOGIN_REPOSITORY = container.resolve(SocialLoginRepository)
 const { socialEnv } = useSocialEnv()
-const redirect_uri = window.location.origin
+const redirect_uri = window.location.origin + ':80'
 
 type StateType = {
   loginParams: LoginParams
