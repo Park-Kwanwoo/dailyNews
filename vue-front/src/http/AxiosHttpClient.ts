@@ -3,6 +3,7 @@ import axios from 'axios'
 import HttpError from '@/http/HttpError.ts'
 import { singleton } from 'tsyringe'
 import { useAuthStore } from '@/store/useAuthStore.ts'
+import router from '@/router'
 
 export type HttpRequestConfig = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
@@ -59,9 +60,13 @@ export default class AxiosHttpClient {
       path: '/api/token/reissue',
       method: 'GET',
     }).then((r) => {
-      const accessToken = r.headers['authorization']
-      auth.setToken(accessToken)
-      return r
+      const statusCode = r.data.statusCode
+
+      if (statusCode == 'SUCCESS') {
+        const accessToken = r.headers['authorization']
+        auth.setToken(accessToken)
+        router.go()
+      }
     })
   }
 }
