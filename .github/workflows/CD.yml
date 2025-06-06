@@ -25,7 +25,7 @@ jobs:
 
       ## vue 환경변수 설정
       - name: Setup Vue Environment variable
-        run: echo ${{ secrets.FRONT_API_KEY }} | base64 --decode >> .env.prod
+        run: echo ${{ secrets.FRONT_API_KEY }} | base64 --decode >> /vue-front/.env.prod
 
       ## vue 프로젝트 의존성 설치
       - name: Install dependencies
