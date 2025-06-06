@@ -34,9 +34,4 @@ public class SocialLoginController {
         CookieUtils.setAuthorization(response, token.getAccessToken());
         return new ResponseEntity<>(ApiResponse.successWithNoContent(), HttpStatus.OK);
     }
-
-    @GetMapping("/auth/test")
-    public String AuthTest() {
-        return "Hi, SUCCESS";
-    }
 }

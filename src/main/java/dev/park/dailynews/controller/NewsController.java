@@ -3,7 +3,6 @@ package dev.park.dailynews.controller;
 import dev.park.dailynews.dto.request.PagingRequest;
 import dev.park.dailynews.dto.response.common.ApiResponse;
 import dev.park.dailynews.dto.response.common.PagingResponse;
-import dev.park.dailynews.dto.response.news.NewsItemDto;
 import dev.park.dailynews.dto.response.news.NewsDetailResponse;
 import dev.park.dailynews.dto.response.news.NewsResponse;
 import dev.park.dailynews.model.LoginUserContext;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
