@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { container } from 'tsyringe'
 import SocialLoginRepository from '@/repository/SocialLoginRepository.ts'
-import { onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { useSocialEnv } from '@/config/useSocialEnv.ts'
 import LoginParams from '@/request/LoginParams.ts'
+import { useAuthStore } from '@/store/useAuthStore.ts'
+import router from '@/router'
 
 const SOCIAL_LOGIN_REPOSITORY = container.resolve(SocialLoginRepository)
 const { socialEnv } = useSocialEnv()
 const redirect_uri = window.location.origin + ':80'
+const authStore = useAuthStore()
+const isLoggedIn = computed(() => authStore.isLoggedIn())
 
 type StateType = {
   loginParams: LoginParams
@@ -26,6 +30,8 @@ function redirectToNaverLogin() {
 }
 
 onMounted(() => {
+  if (isLoggedIn.value) router.replace('/main')
+
   const query = new URLSearchParams(window.location.search)
   const code = query.get('code')
   const state = query.get('state')
