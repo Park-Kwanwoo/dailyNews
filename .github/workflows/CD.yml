@@ -23,6 +23,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
 
+      ## vue 환경변수 설정
+      - name: Setup Vue Environment variable
+        run: echo ${{ FRONT_API_KEY }} | base64 --decode >> .env.prod
+
       ## vue 프로젝트 의존성 설치
       - name: Install dependencies
         run: npm --prefix vue-front ci
