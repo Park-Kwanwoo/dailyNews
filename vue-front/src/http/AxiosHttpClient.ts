@@ -65,7 +65,7 @@ export default class AxiosHttpClient {
       if (statusCode == 'SUCCESS') {
         const accessToken = r.headers['authorization']
         auth.setToken(accessToken)
-        router.go()
+        router.go(0)
       }
     })
   }

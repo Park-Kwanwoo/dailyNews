@@ -21,7 +21,7 @@ export default class SubjectRepository {
       })
       .then((r) => {
         const statusCode = r.statusCode
-        if (statusCode == 'SUCCESS') router.go()
+        if (statusCode == 'SUCCESS') router.go(0)
       })
       .catch((e) => {
         ElMessage.error('주제가 등록되지 않았습니다. 다시 시도해주세요')
