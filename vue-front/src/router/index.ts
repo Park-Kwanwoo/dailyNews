@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
 import MainView from '@/views/MainView.vue'
 import NewsView from '@/views/NewsView.vue'
+import SubjectView from '@/views/SubjectView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,14 @@ const router = createRouter({
       props: (route) => ({
         newsId: Number(route.params.newsId),
       }),
+    },
+    {
+      path: '/subject',
+      name: 'subject',
+      component: SubjectView,
+      meta: {
+        reload: true,
+      },
     },
   ],
 })
