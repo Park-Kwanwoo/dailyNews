@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class NewController {
+public class NewsController {
 
     private final NewsService newsService;
 
