@@ -4,8 +4,6 @@ import AxiosHttpClient from '@/http/AxiosHttpClient.ts'
 import ApiResponse from '@/response/ApiResponse.ts'
 import { plainToInstance } from 'class-transformer'
 import Paging from '@/entity/Paging.ts'
-import { ElMessage } from 'element-plus'
-import router from '@/router'
 
 @singleton()
 export default class HttpRepository {
@@ -32,15 +30,13 @@ export default class HttpRepository {
         if (statusCode === 'SUCCESS') {
           return plainToInstance(clazz, apiResponse.data)
         } else {
-          ElMessage.error(apiResponse.message)
-          router.replace('/')
+          return apiResponse
         }
       })
       .catch((e) => {
         return e
       })
   }
-
   public getList<T>(
     config: HttpRequestConfig,
     clazz: { new (...args: any[]): T },
@@ -63,11 +59,10 @@ export default class HttpRepository {
       .request({ ...config })
       .then((r) => {
         const apiResponse = plainToInstance<ApiResponse<T>, any>(ApiResponse, r.data)
+        const statusCode = apiResponse.statusCode
 
-        if (apiResponse.data != null) {
-          return plainToInstance(clazz, apiResponse.data)
-        } else {
-          return apiResponse
+        if (statusCode === 'SUCCESS' && clazz != null) {
+          plainToInstance(clazz, apiResponse.data)
         }
       })
       .catch((e) => {
