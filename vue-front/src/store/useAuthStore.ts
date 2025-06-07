@@ -11,6 +11,12 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('accessToken', token)
   }
 
+  function getToken() {
+    return accessToken.value == '' || undefined || null
+      ? localStorage.getItem('accessToken')
+      : accessToken.value
+  }
+
   function isLoggedIn() {
     return accessToken.value != '' && localStorage.getItem('accessToken') != ''
   }
@@ -23,6 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     accessToken,
     setToken,
+    getToken,
     isLoggedIn,
     logout,
   }

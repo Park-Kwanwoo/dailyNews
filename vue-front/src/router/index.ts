@@ -26,8 +26,8 @@ const router = createRouter({
       }),
     },
     {
-      path: '/subject',
-      name: 'subject',
+      path: '/subjects',
+      name: 'subjects',
       component: SubjectView,
       meta: {
         reload: true,

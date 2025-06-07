@@ -9,7 +9,7 @@ import router from '@/router'
 
 const SUBJECT_REPOSITORY = container.resolve(SubjectRepository)
 const authStore = useAuthStore()
-const accessToken = authStore.accessToken
+const accessToken = authStore.getToken()
 const isLoggedIn = computed(() => authStore.isLoggedIn())
 
 type StateType = {

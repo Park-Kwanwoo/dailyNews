@@ -15,7 +15,7 @@ type StateType = {
 const NEWS_REPOSITORY = container.resolve(NewsRepository)
 
 const authStore = useAuthStore()
-const accessToken = authStore.accessToken
+const accessToken = authStore.getToken()
 const isLoggedIn = computed(() => authStore.isLoggedIn())
 
 const state = reactive<StateType>({
