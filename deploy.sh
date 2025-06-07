@@ -35,6 +35,7 @@ STOP_CONTAINER_ID=$(docker ps --filter "name=$STOP_TARGET" --quiet)
 if [ -n $STOP_CONTAINER_ID ]; then
   docker stop $STOP_CONTAINER_ID
   docker rm $STOP_CONTAINER_ID
+  docker image prune -af
 fi
 
 sudo systemctl reload nginx
