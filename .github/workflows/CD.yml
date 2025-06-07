@@ -23,15 +23,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
 
-      ## vue 환경변수 설정
+      ## Vue 환경변수 설정
       - name: Setup Vue Environment variable
         run: echo ${{ secrets.FRONT_API_KEY }} | base64 --decode >> vue-front/.env.prod
 
-      ## vue 프로젝트 의존성 설치
+      ## Vue 프로젝트 의존성 설치
       - name: Install dependencies
         run: npm --prefix vue-front ci
 
-      ## vue 프로젝트 빌드 및 빌드 파일 옮기기
+      ## Vue 프로젝트 빌드 및 빌드 파일 옮기기
       - name: Build And Move Vue project
         run: |
           npm --prefix vue-front run build
@@ -43,6 +43,10 @@ jobs:
         run: |
           echo ${{ secrets.APPLICATION_DB_YML }} | base64 --decode >> src/main/resources/application-prod-db.yml
           echo ${{ secrets.APPLICATION_KEY_YML }} | base64 --decode >> src/main/resources/application-prod-key.yml
+
+      ## OpenAI.json 파일 셋
+      - name: Set OpenAI json
+        run: echo ${{ secrets.OPEN_AI_JSON }} | base64 --decode >> src/main/resources/OpenAI.json
 
       ## JDK 셋업
       - name: Set up JDK 17
