@@ -12,7 +12,7 @@ export default class SubjectRepository {
   public registerSubject(request: SubjectRequest, auth: string | null) {
     return this.httpRepository
       .post({
-        path: '/api/register/subject',
+        path: 'register/subject',
         body: request,
         method: 'POST',
         headers: {
@@ -32,7 +32,7 @@ export default class SubjectRepository {
     return this.httpRepository
       .get<Subject>(
         {
-          path: '/api/subject',
+          path: 'subject',
           method: 'GET',
           headers: {
             Authorization: auth,

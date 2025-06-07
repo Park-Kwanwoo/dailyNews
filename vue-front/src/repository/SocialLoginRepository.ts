@@ -14,7 +14,7 @@ export default class SocialLoginRepository {
 
     return this.httpRepository
       .login({
-        path: '/api/social/login',
+        path: '/social/login',
         body: req,
         method: 'POST',
       })
