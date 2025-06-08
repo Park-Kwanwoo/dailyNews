@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 import Subject from '@/entity/Subject.ts'
 import SubjectRequest from '@/request/SubjectRequest.ts'
 import router from '@/router'
+import { ElMessage } from 'element-plus'
 
 const SUBJECT_REPOSITORY = container.resolve(SubjectRepository)
 const authStore = useAuthStore()
@@ -22,8 +23,16 @@ const state = reactive<StateType>({
   subjectRequest: new SubjectRequest(),
 })
 
+function isValidKoreanSentence(str: string) {
+  return /^[가-힣\s]+$/.test(str.trim())
+}
+
 function registerSubject() {
-  SUBJECT_REPOSITORY.registerSubject(state.subjectRequest, accessToken)
+  if (state.subjectRequest.keyword == '' || isValidKoreanSentence(state.subjectRequest.keyword)) {
+    ElMessage.error('한글로된 주제를 입력해주세요.')
+  } else {
+    SUBJECT_REPOSITORY.registerSubject(state.subjectRequest, accessToken)
+  }
 }
 
 onMounted(() => {
@@ -51,7 +60,7 @@ onMounted(() => {
     <el-divider />
     <el-input
       v-model="state.subjectRequest.keyword"
-      placeholder="새로운 주제를 입력하세요"
+      placeholder="부적절한 주제는 뉴스 생성이 어려울 수 있습니다."
       class="mb-2"
     />
     <el-button type="primary" @click="registerSubject()" style="float: right">변경</el-button>
