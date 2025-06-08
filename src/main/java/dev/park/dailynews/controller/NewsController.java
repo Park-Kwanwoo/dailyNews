@@ -23,7 +23,8 @@ public class NewsController {
 
     private final NewsService newsService;
 
-    @Scheduled(cron = "0 8 * * * *")
+//    @Scheduled(cron = "0 8 * * * *")
+    @Scheduled(cron = "45 16 * * * *")
     public void generateNews() {
         newsService.issueAndStoreNews();
     }
