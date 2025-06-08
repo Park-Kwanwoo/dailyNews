@@ -18,8 +18,9 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @PostMapping("/register/subject")
-    public void registerSubject(@RequestBody SubjectRequest subject, LoginUserContext user) {
+    public ApiResponse<?> registerSubject(@RequestBody SubjectRequest subject, LoginUserContext user) {
         subjectService.register(subject, user);
+        return ApiResponse.successWithNoContent();
     }
 
     @GetMapping("/subject")
