@@ -7,6 +7,8 @@ on:
 
 jobs:
   build:
+
+    if: ${{ !contains(github.event.head_commit.messages, '[skip]') }}
     runs-on: self-hosted
 
     strategy:
@@ -78,7 +80,7 @@ jobs:
 
       ## 프로젝트 빌드
       - name: Build Application
-        run: ./gradlew build -x test
+        run: ./gradlew clean build -x test
 
       ## docker 이미지로 빌드
       - name: Docker Build and push Docker Images
