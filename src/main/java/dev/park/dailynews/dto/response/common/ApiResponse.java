@@ -1,8 +1,15 @@
 package dev.park.dailynews.dto.response.common;
 
+import dev.park.dailynews.model.ExceptionContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -28,5 +35,16 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> error(String message) {
         return new ApiResponse<>(ERROR, message, null);
+    }
+
+    public static ApiResponse<?> errorWithBindingResult(BindingResult e) {
+
+        List<ExceptionContext> exceptions = new ArrayList<>();
+
+        for (FieldError error : e.getFieldErrors()) {
+            exceptions.add(ExceptionContext.from(error));
+        }
+
+        return new ApiResponse<>(ERROR, null, exceptions);
     }
 }
