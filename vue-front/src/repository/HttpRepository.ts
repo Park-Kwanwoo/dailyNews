@@ -59,11 +59,7 @@ export default class HttpRepository {
       .request({ ...config })
       .then((r) => {
         const apiResponse = plainToInstance<ApiResponse<T>, any>(ApiResponse, r.data)
-        const statusCode = apiResponse.statusCode
-
-        if (statusCode === 'SUCCESS' && clazz != null) {
-          plainToInstance(clazz, apiResponse.data)
-        }
+        return apiResponse
       })
       .catch((e) => {
         return e
