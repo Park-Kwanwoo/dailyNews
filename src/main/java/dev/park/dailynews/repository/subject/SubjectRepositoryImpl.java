@@ -15,11 +15,11 @@ public class SubjectRepositoryImpl implements SubjectRepositoryCustom {
     @Override
     public Subject findByUserEmail(String email) {
 
-        return jpaQueryFactory.select(subject)
-                .from(subject)
-                .innerJoin(user)
-                .on(subject.user.email.eq(user.email))
-                .fetchFirst();
+        return jpaQueryFactory.selectFrom(subject)
+                .innerJoin(subject.user, user)
+                .fetchJoin()
+                .where(user.email.eq(email))
+                .fetchOne();
 
     }
 }
