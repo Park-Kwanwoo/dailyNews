@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <div class="header">
     <div class="title">데일리 뉴스</div>

@@ -12,9 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function getToken() {
-    return accessToken.value == '' || undefined || null
-      ? localStorage.getItem('accessToken')
-      : accessToken.value
+    return accessToken.value == '' ? localStorage.getItem('accessToken') : accessToken.value
   }
 
   function isLoggedIn() {
