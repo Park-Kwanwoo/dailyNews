@@ -23,7 +23,7 @@ public class NewsController {
 
     private final NewsService newsService;
 
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 0 8 * * *", zone = "Asia/Seoul")
     public void generateNews() {
         newsService.issueAndStoreNews();
     }

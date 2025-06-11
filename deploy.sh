@@ -26,7 +26,7 @@ else
 fi
 
 docker pull pgw4712/dailynews:latest
-docker run -d --network ec2-user_network -p $WAS_RUN_PORT:8080 --name $RUN_TARGET pgw4712/dailynews:latest
+docker run -d --network ec2-user_network -p $WAS_RUN_PORT:8080 --name $RUN_TARGET -e TZ=Asia/Seoul pgw4712/dailynews:latest
 docker logout
 
 sleep 30
