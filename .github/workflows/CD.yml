@@ -51,7 +51,14 @@ jobs:
 
       ## OpenAI.json 파일 셋
       - name: Set OpenAI json
-        run: echo ${{ secrets.OPEN_AI_JSON }} | base64 --decode >> src/main/resources/OpenAI.json
+        id: OpenAI-Generator
+        run: |
+          echo ${{ secrets.OPEN_AI_JSON }} | base64 --decode >> src/main/resources/OpenAI.json
+          echo "key=${{ secrets.OPEN_AI_JSON }} | base64 --decode" >> $GITHUB_OUTPUT
+
+      ## OpenAI.json 파일 echo 테스트
+      - name: OpenAI.json echo test
+        run: echo ${{ steps.OpenAI-Generator.outputs.key }}
 
       ## JDK 셋업
       - name: Set up JDK 17
