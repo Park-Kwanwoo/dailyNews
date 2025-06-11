@@ -3,8 +3,9 @@ package dev.park.dailynews.infra.social;
 import dev.park.dailynews.domain.social.KakaoToken;
 import dev.park.dailynews.domain.social.KakaoUserInfo;
 import dev.park.dailynews.domain.social.SocialProvider;
-import dev.park.dailynews.domain.social.SocialUserInfo;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
+import dev.park.dailynews.dto.response.sosical.SocialLogoutParams;
+import dev.park.dailynews.model.SocialUserInfoContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -14,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import static dev.park.dailynews.domain.social.SocialProvider.KAKAO;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
@@ -28,16 +30,17 @@ public class KakaoClient implements SocialClient {
 
     @Override
     public SocialProvider socialProvider() {
-        return SocialProvider.KAKAO;
+        return KAKAO;
     }
+
     @Override
     public String requestAccessToken(SocialLoginParams params) {
 
-        HttpEntity<MultiValueMap<String, String>> request = tokenRequest(params.getCode());
+        HttpEntity<MultiValueMap<String, String>> tokenRequest = tokenRequest(params.getCode());
 
         KakaoToken kakaoToken = rt.postForObject(
                 kakaoProperties.getTokenUrl(),
-                request,
+                tokenRequest,
                 KakaoToken.class
         );
 
@@ -45,17 +48,36 @@ public class KakaoClient implements SocialClient {
     }
 
     @Override
-    public SocialUserInfo requestUserInfo(String accessToken) {
+    public SocialUserInfoContext requestUserInfo(String accessToken) {
 
-        HttpEntity<MultiValueMap<String, String>> request = userInfoRequest(accessToken);
+        HttpEntity<MultiValueMap<String, String>> userInfoRequest = userInfoRequest(accessToken);
 
         KakaoUserInfo kakaoUserInfo = rt.postForObject(
                 kakaoProperties.getUserInfoUrl(),
-                request,
+                userInfoRequest,
                 KakaoUserInfo.class
         );
 
-        return kakaoUserInfo;
+        return SocialUserInfoContext.builder()
+                .email(kakaoUserInfo.getEmail())
+                .nickname(kakaoUserInfo.getNickname())
+                .provider(KAKAO)
+                .socialToken(accessToken)
+                .build();
+    }
+
+    @Override
+    public void logout(SocialLogoutParams params) {
+
+        HttpEntity<MultiValueMap<String, String>> logoutRequest = logoutRequest(params.getToken());
+
+        String id = rt.postForObject(
+                kakaoProperties.getLogoutUrl(),
+                logoutRequest,
+                String.class
+        );
+
+        log.info("{}", id);
     }
 
     private HttpEntity<MultiValueMap<String, String>> tokenRequest(String code) {
@@ -70,9 +92,7 @@ public class KakaoClient implements SocialClient {
         body.add("client_secret", kakaoProperties.getClientSecret());
         body.add("code", code);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-
-        return request;
+        return new HttpEntity<>(body, headers);
     }
 
     private HttpEntity<MultiValueMap<String, String>> userInfoRequest(String accessToken) {
@@ -83,6 +103,15 @@ public class KakaoClient implements SocialClient {
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("property_keys", "[\"kakao_account.email\", \"kakao_account.profile.nickname\"]");
+
+        return new HttpEntity<>(body, headers);
+    }
+
+    private HttpEntity<MultiValueMap<String, String>> logoutRequest(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
+        headers.add(AUTHORIZATION, "Bearer " + token);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 
         return new HttpEntity<>(body, headers);
     }

@@ -1,9 +1,8 @@
 package dev.park.dailynews.interceptor;
 
-import dev.park.dailynews.common.SessionUtils;
+import dev.park.dailynews.common.CookieUtils;
 import dev.park.dailynews.exception.UnAuthorized;
 import dev.park.dailynews.infra.auth.jwt.TokenValidator;
-import dev.park.dailynews.model.SessionContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +21,15 @@ public class TokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         String accessToken = request.getHeader("Authorization");
-        SessionContext session = SessionUtils.getSessionInfo(request);
 
-        if (accessToken == null || !tokenValidator.validToken(accessToken, session)) {
+        if (accessToken == null || !tokenValidator.validToken(accessToken)) {
             throw new UnAuthorized();
         }
+
+        if (request.getRequestURI().equals("/social/logout")) {
+            CookieUtils.setAccessToken(response, accessToken);
+        }
+
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 }

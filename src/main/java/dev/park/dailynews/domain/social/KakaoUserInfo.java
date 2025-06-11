@@ -3,7 +3,9 @@ package dev.park.dailynews.domain.social;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record KakaoUserInfo(@JsonProperty("kakao_account") KakaoAccount kakaoAccount) implements SocialUserInfo {
+public record KakaoUserInfo(
+        @JsonProperty("id") String id,
+        @JsonProperty("kakao_account") KakaoAccount kakaoAccount) implements SocialUserInfo {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record KakaoAccount(String email, Profile profile) {
@@ -26,5 +28,10 @@ public record KakaoUserInfo(@JsonProperty("kakao_account") KakaoAccount kakaoAcc
     @Override
     public String getNickname() {
         return kakaoAccount.profile.nickname;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 }

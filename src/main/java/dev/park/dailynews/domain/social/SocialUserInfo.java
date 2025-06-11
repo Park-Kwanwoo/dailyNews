@@ -6,4 +6,6 @@ public interface SocialUserInfo {
     String getEmail();
 
     String getNickname();
+
+    String getId();
 }

@@ -5,17 +5,23 @@ import dev.park.dailynews.domain.social.NaverUserInfo;
 import dev.park.dailynews.domain.social.SocialProvider;
 import dev.park.dailynews.domain.social.SocialUserInfo;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
+import dev.park.dailynews.dto.response.sosical.SocialLogoutParams;
+import dev.park.dailynews.model.SocialUserInfoContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-@Getter
-@Service
+import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
+
+@Slf4j
+@Component
 @RequiredArgsConstructor
 public class NaverClient implements SocialClient {
 
@@ -24,13 +30,13 @@ public class NaverClient implements SocialClient {
 
     @Override
     public SocialProvider socialProvider() {
-        return SocialProvider.NAVER;
+        return NAVER;
     }
 
     @Override
     public String requestAccessToken(SocialLoginParams params) {
 
-        HttpEntity<MultiValueMap<String, String>> request = makeTokenRequest(params.getCode());
+        HttpEntity<MultiValueMap<String, String>> request = tokenRequest(params.getCode());
 
         NaverToken naverToken = rt.postForObject(
                 naverProperties.getTokenUrl(),
@@ -42,19 +48,40 @@ public class NaverClient implements SocialClient {
     }
 
     @Override
-    public SocialUserInfo requestUserInfo(String accessToken) {
+    public SocialUserInfoContext requestUserInfo(String accessToken) {
 
-        HttpEntity<MultiValueMap<String, String>> request = makeUserInfoRequest(accessToken);
+        HttpEntity<MultiValueMap<String, String>> request = userInfoRequest(accessToken);
 
         NaverUserInfo naverUserInfo = rt.postForObject(
                 naverProperties.getUserInfoUrl(),
                 request,
                 NaverUserInfo.class
         );
-        return naverUserInfo;
+        return SocialUserInfoContext.builder()
+                .id(naverUserInfo.getId())
+                .email(naverUserInfo.getEmail())
+                .nickname(naverUserInfo.getNickname())
+                .provider(NAVER)
+                .socialToken(accessToken)
+                .build();
     }
 
-    private HttpEntity<MultiValueMap<String, String>> makeTokenRequest(String code) {
+    @Override
+    public void logout(SocialLogoutParams params) {
+
+        HttpEntity<MultiValueMap<String, String>> logoutRequest = logoutRequest(params);
+
+        Object o = rt.postForObject(
+                naverProperties.getTokenUrl(),
+                logoutRequest,
+                Object.class
+        );
+
+        log.info("{}", o);
+
+    }
+
+    private HttpEntity<MultiValueMap<String, String>> tokenRequest(String code) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -69,12 +96,27 @@ public class NaverClient implements SocialClient {
         return new HttpEntity<>(body, headers);
     }
 
-    private HttpEntity<MultiValueMap<String, String>> makeUserInfoRequest(String accessToken) {
+    private HttpEntity<MultiValueMap<String, String>> userInfoRequest(String accessToken) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
         return new HttpEntity<>(headers);
+    }
+
+    private HttpEntity<MultiValueMap<String, String>> logoutRequest(SocialLogoutParams params) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "delete");
+        body.add("client_id", naverProperties.getClientId());
+        body.add("client_secret", naverProperties.getClientSecret());
+        body.add("access_token", params.getToken());
+        body.add("service_provider", params.getProvider().toString());
+
+        return new HttpEntity<>(body, headers);
     }
 }

@@ -36,6 +36,8 @@ public class JwtUtils {
                 .add("typ", "JWT")
                 .and()
                 .claim("uuid", userContext.getUuid())
+                .claim("socialToken", userContext.getSocialToken())
+                .claim("provider", userContext.getProvider())
                 .subject(userContext.getEmail())
                 .issuedAt(now)
                 .expiration(expiration)
@@ -54,6 +56,8 @@ public class JwtUtils {
                 .add("typ", "JWT")
                 .and()
                 .claim("uuid", userContext.getUuid())
+                .claim("socialToken", userContext.getSocialToken())
+                .subject(userContext.getEmail())
                 .issuedAt(now)
                 .expiration(expiration)
                 .issuer(jwtProperties.issuer())
@@ -84,5 +88,22 @@ public class JwtUtils {
 
     public String extractUUID(String token) {
         return extractClaims(token, claims -> claims.get("uuid", String.class));
+    }
+
+    public String extractSocialToken(String token) {
+        return extractClaims(token, claims -> claims.get("socialToken", String.class));
+    }
+
+    public String extractProvider(String token) {
+        return extractClaims(token, claims -> claims.get("provider", String.class));
+    }
+
+    public Long extractExpiration(String token) {
+        return extractClaims(token, Claims::getExpiration).getTime();
+    }
+
+    public boolean isValidIssuer(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.getIssuer().equals(jwtProperties.issuer());
     }
 }

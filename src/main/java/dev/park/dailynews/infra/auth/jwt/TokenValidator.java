@@ -2,12 +2,11 @@ package dev.park.dailynews.infra.auth.jwt;
 
 import dev.park.dailynews.exception.ExpiredTokenException;
 import dev.park.dailynews.exception.InvalidTokenException;
-import dev.park.dailynews.model.SessionContext;
-import dev.park.dailynews.model.TokenContext;
-import dev.park.dailynews.service.TokenService;
+import dev.park.dailynews.exception.TokenBlacklistException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,11 +14,11 @@ import org.springframework.stereotype.Component;
 public class TokenValidator {
 
     private final JwtUtils jwtUtils;
-    private final TokenService tokenService;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public boolean validToken(String accessToken, SessionContext session) {
+    public boolean validToken(String accessToken) {
         try {
-            return this.isTokenInfoMatch(accessToken, session);
+            return this.isTokenValid(accessToken);
         } catch (ExpiredJwtException e) {
             throw new ExpiredTokenException("expired_accessToken");
         } catch (JwtException e) {
@@ -27,16 +26,21 @@ public class TokenValidator {
         }
     }
 
-    private boolean isTokenInfoMatch(String token, SessionContext session) {
+    private boolean isTokenValid(String token) {
 
-        String uuid = jwtUtils.extractUUID(token);
-        String email = jwtUtils.extractSubject(token);
-        String issuer = jwtUtils.extractIssuer(token);
-        TokenContext savedToken = tokenService.getTokenByUUID(uuid);
+        boolean validIssuer = jwtUtils.isValidIssuer(token);
+        boolean tokenBlacklist = isTokenBlacklist(token);
 
-        return savedToken.getIp().equals(session.getIp()) &&
-                savedToken.getUserAgent().equals(session.getUserAgent()) &&
-                savedToken.getEmail().equals(email) &&
-                issuer.equals(jwtUtils.getJwtProperties().issuer());
+        return validIssuer && tokenBlacklist;
+
+    }
+
+    private boolean isTokenBlacklist(String token) {
+
+        if (stringRedisTemplate.opsForValue().get(token) != null) {
+            throw new TokenBlacklistException();
+        }
+
+        return true;
     }
 }

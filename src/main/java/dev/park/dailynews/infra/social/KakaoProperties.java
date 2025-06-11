@@ -1,11 +1,11 @@
 package dev.park.dailynews.infra.social;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "social.kakao")
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 public class KakaoProperties {
 
@@ -16,4 +16,5 @@ public class KakaoProperties {
 
     private final String tokenUrl;
     private final String userInfoUrl;
+    private final String logoutUrl;
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public record NaverUserInfo(Response response) implements SocialUserInfo {
 
     @JsonIgnoreProperties
-    public record Response(String email, String nickname) {
+    public record Response(String email, String nickname, String id) {
     }
     @Override
     public SocialProvider getProvider() {
@@ -21,4 +21,11 @@ public record NaverUserInfo(Response response) implements SocialUserInfo {
     public String getNickname() {
         return response.nickname;
     }
+
+    @Override
+    public String getId() {
+        return response.id;
+    }
+
+
 }
