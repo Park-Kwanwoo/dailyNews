@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/store/useAuthStore'
-import { container } from 'tsyringe'
 import Subject from '@/entity/Subject.ts'
-import NewsRepository from '@/repository/NewsRepository.ts'
+import { NEWS_REPOSITORY } from '@/repository/httpProviders.ts'
+
 import Paging from '@/entity/Paging.ts'
 import News from '@/entity/News.ts'
 import router from '@/router'
@@ -12,7 +12,6 @@ type StateType = {
   subject: Subject
   newsList: Paging<News>
 }
-const NEWS_REPOSITORY = container.resolve(NewsRepository)
 
 const authStore = useAuthStore()
 const accessToken = authStore.getToken()

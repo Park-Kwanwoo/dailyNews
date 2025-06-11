@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { container } from 'tsyringe'
-import SubjectRepository from '@/repository/SubjectRepository.ts'
+import { SUBJECT_REPOSITORY } from '@/repository/httpProviders.ts'
+
 import { computed, onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/store/useAuthStore'
 import Subject from '@/entity/Subject.ts'
 import SubjectRequest from '@/request/SubjectRequest.ts'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
-
-const SUBJECT_REPOSITORY = container.resolve(SubjectRepository)
 const authStore = useAuthStore()
 const accessToken = authStore.getToken()
 const isLoggedIn = computed(() => authStore.isLoggedIn())
@@ -36,8 +34,8 @@ function registerSubject() {
 }
 
 onMounted(() => {
-  if (!isLoggedIn) {
-    router.replace('/social')
+  if (!isLoggedIn.value) {
+    router.replace('/')
   } else {
     SUBJECT_REPOSITORY.getSubjects(accessToken).then((subject) => {
       state.subject = subject

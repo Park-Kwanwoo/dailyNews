@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { container } from 'tsyringe'
-import SocialLoginRepository from '@/repository/SocialLoginRepository.ts'
 import { computed, onMounted, reactive } from 'vue'
 import { useSocialEnv } from '@/config/useSocialEnv.ts'
 import LoginParams from '@/request/LoginParams.ts'
 import { useAuthStore } from '@/store/useAuthStore.ts'
 import router from '@/router'
+import { SOCIAL_AUTH_REPOSITORY } from '@/repository/httpProviders.ts'
 
-const SOCIAL_LOGIN_REPOSITORY = container.resolve(SocialLoginRepository)
 const { socialEnv } = useSocialEnv()
-const redirect_uri = window.location.origin + ':80'
+// const redirect_uri = window.location.origin + ':80'
+const redirect_uri = window.location.origin
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn())
 
@@ -49,7 +48,7 @@ onMounted(() => {
 })
 
 function login(params: LoginParams) {
-  SOCIAL_LOGIN_REPOSITORY.login(params)
+  SOCIAL_AUTH_REPOSITORY.login(params)
 }
 </script>
 

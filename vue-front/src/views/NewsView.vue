@@ -55,7 +55,13 @@ onMounted(() => {
 
           <div class="news-source">
             출처:
-            <el-link :href="item.sourceUrl" target="_blank" type="primary" :underline="false">
+            <el-link
+              :href="item.sourceUrl"
+              target="_blank"
+              type="primary"
+              :underline="false"
+              rel="noopener norefrrer"
+            >
               {{ item.source }}
             </el-link>
           </div>

@@ -11,7 +11,7 @@ export default class NewsRepository {
     return this.httpRepository.getList(
       {
         method: 'GET',
-        path: `news?page=${page}&size=10`,
+        path: `/news?page=${page}&size=10`,
         headers: {
           Authorization: auth,
         },
@@ -24,7 +24,7 @@ export default class NewsRepository {
     return this.httpRepository.get(
       {
         method: 'GET',
-        path: `news/${newsId}`,
+        path: `/news/${newsId}`,
         headers: {
           Authorization: auth,
         },

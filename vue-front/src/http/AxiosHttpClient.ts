@@ -57,7 +57,7 @@ export default class AxiosHttpClient {
     const auth = useAuthStore()
 
     this.request({
-      path: 'token/reissue',
+      path: '/token/reissue',
       method: 'GET',
     }).then((r) => {
       const statusCode = r.data.statusCode

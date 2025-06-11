@@ -6,7 +6,7 @@ import LoginParams from '@/request/LoginParams.ts'
 import { useAuthStore } from '@/store/useAuthStore.ts'
 
 @singleton()
-export default class SocialLoginRepository {
+export default class SocialAuthRepository {
   constructor(@inject(HttpRepository) private readonly httpRepository: HttpRepository) {}
 
   public login(req: LoginParams) {
@@ -26,6 +26,26 @@ export default class SocialLoginRepository {
       .catch((e) => {
         ElMessage.error(e.message)
         router.replace('/')
+      })
+  }
+
+  public logout() {
+    const auth = useAuthStore()
+
+    return this.httpRepository
+      .post({
+        path: '/social/logout',
+        method: 'POST',
+        headers: {
+          Authorization: auth.getToken(),
+        },
+      })
+      .then((r) => {
+        const statusCode = r.statusCode
+        if (statusCode == 'SUCCESS') {
+          auth.logout()
+          router.replace('/')
+        }
       })
   }
 }
