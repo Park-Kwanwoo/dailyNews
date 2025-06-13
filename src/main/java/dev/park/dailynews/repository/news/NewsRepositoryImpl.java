@@ -36,14 +36,14 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
     }
 
     @Override
-    public News findWithItemsBy(Long id) {
+    public News findNewsWithItemsByNewsIdAndUserId(Long newsId, Long userId) {
 
         return jpqlQueryFactory.select(news)
                 .from(news)
                 .innerJoin(news.newsItems, newsItem)
                 .fetchJoin()
-                .where(news.id.eq(id))
-                .fetchFirst();
+                .where(news.id.eq(newsId).and(news.user.id.eq(userId)))
+                .fetchOne();
     }
 
 

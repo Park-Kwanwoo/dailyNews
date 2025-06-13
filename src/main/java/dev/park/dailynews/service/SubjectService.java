@@ -44,7 +44,7 @@ public class SubjectService {
 
     public void update(SubjectRequest subjectRequest, LoginUserContext user) {
 
-        Subject savedSubject = subjectRepository.findByUserEmail(user.getEmail());
+        Subject savedSubject = subjectRepository.findSubjectWithUserByEmail(user.getEmail());
 
         if (savedSubject != null) {
             savedSubject.changeKeyword(subjectRequest.getKeyword());
@@ -53,7 +53,7 @@ public class SubjectService {
 
     public SubjectResponse getSubject(LoginUserContext user) {
 
-        Subject subject = subjectRepository.findByUserEmail(user.getEmail());
+        Subject subject = subjectRepository.findSubjectWithUserByEmail(user.getEmail());
         return subject == null ? new SubjectResponse("") : SubjectResponse.from(subject.getKeyword());
     }
 }

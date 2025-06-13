@@ -3,7 +3,6 @@ package dev.park.dailynews.controller;
 import dev.park.dailynews.common.CookieUtils;
 import dev.park.dailynews.dto.response.common.ApiResponse;
 import dev.park.dailynews.dto.response.token.TokenResponse;
-import dev.park.dailynews.model.SessionContext;
 import dev.park.dailynews.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

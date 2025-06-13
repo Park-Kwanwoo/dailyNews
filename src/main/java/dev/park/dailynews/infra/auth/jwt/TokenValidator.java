@@ -40,7 +40,6 @@ public class TokenValidator {
         if (stringRedisTemplate.opsForValue().get(token) != null) {
             throw new TokenBlacklistException();
         }
-
         return true;
     }
 }

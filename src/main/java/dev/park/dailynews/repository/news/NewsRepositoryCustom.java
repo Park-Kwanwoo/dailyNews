@@ -8,5 +8,5 @@ public interface NewsRepositoryCustom {
 
     PageImpl<News> getPagingNewsList(PagingRequest pagingRequest, Long userId);
 
-    News findWithItemsBy(Long id);
+    News findNewsWithItemsByNewsIdAndUserId(Long newsId, Long userId);
 }
