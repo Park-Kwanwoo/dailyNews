@@ -37,6 +37,7 @@ social:
     redirect-uri: http://localhost:80/social/test
     token-url: http://localhost:80/oauth/token
     user-info-url: http://localhost:80/v2/user/me
+    logout-url: http://localhost:80/v1/user/logout
   naver:
     grant-type: test-authorization_code
     client-id: test-client-id

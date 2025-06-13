@@ -1,13 +1,15 @@
 package dev.park.dailynews.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.park.dailynews.config.DailyTest;
+import dev.park.dailynews.domain.news.News;
+import dev.park.dailynews.domain.news.NewsItem;
 import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
-import dev.park.dailynews.dto.request.SubjectRequest;
+import dev.park.dailynews.exception.TokenNotFoundException;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
 import dev.park.dailynews.model.UserContext;
+import dev.park.dailynews.repository.news.NewsRepository;
 import dev.park.dailynews.repository.subject.SubjectRepository;
 import dev.park.dailynews.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,50 +17,49 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.http.HttpHeaders.USER_AGENT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DailyTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class SubjectControllerTest {
+public class NewsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private SubjectRepository subjectRepository;
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private UserRepository userRepository;
 
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    @Autowired
+    private NewsRepository newsRepository;
     private static final String UUID = "test-uuid";
 
     private static final String USER_EMAIL = "test@mail.com";
     private static final String USER_NICKNAME = "테스터";
     private static final String SOCIAL_TOKEN = "test-social-token";
-
-    @BeforeEach
-    void clean() {
-        userRepository.deleteAll();
-        saveUser();
-    }
 
     void saveUser() {
         User user = User.builder()
@@ -76,11 +77,50 @@ class SubjectControllerTest {
                 .orElseThrow(UserNotFoundException::new);
 
         Subject subject = Subject.builder()
-                .keyword("AI 전망")
+                .keyword("LCK")
                 .build();
-        savedUser.setSubject(subject);
+
+        subject.setUser(savedUser);
 
         subjectRepository.save(subject);
+    }
+
+    void saveNewsList() {
+
+        User savedUser = userRepository.findByEmail(USER_EMAIL)
+                .orElseThrow(UserNotFoundException::new);
+
+        List<News> newsList = IntStream.rangeClosed(1, 10)
+                .mapToObj(i -> {
+                    News news = News.builder().title("테스트 뉴스" + i).build();
+                    IntStream.rangeClosed(1, 3)
+                            .forEach(j -> {
+                                NewsItem newsItem = NewsItem.builder()
+                                        .headline("헤드라인 " + j)
+                                        .summary("요약 " + j)
+                                        .source("출처 " + j)
+                                        .sourceUrl("출처 url " + j)
+                                        .build();
+
+                                newsItem.setNews(news);
+                            });
+
+                    news.setUser(savedUser);
+                    return news;
+                })
+                .toList();
+
+        newsRepository.saveAll(newsList);
+    }
+
+    @BeforeEach
+    void setUpAndClean() {
+        userRepository.deleteAll();
+        subjectRepository.deleteAll();
+        newsRepository.deleteAll();
+        saveUser();
+        saveSubject();
+        saveNewsList();
     }
 
     UserContext createUserContext() {
@@ -93,78 +133,42 @@ class SubjectControllerTest {
     }
 
     @Test
-    @DisplayName("Subject_등록_성공")
-    void SUCCESS_REGISTER_SUBJECT() throws Exception {
-
-        // given
-        SubjectRequest subjectRequest = new SubjectRequest("AI 전망");
-        String json = objectMapper.writeValueAsString(subjectRequest);
-        UserContext userContext = createUserContext();
-        String accessToken = jwtUtils.generateAccessToken(userContext);
-
-        // when
-        mockMvc.perform(post("/register/subject")
-                        .contentType(APPLICATION_JSON)
-                        .content(json)
-                        .header(AUTHORIZATION, accessToken)
-                )
-                .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
-                .andDo(print());
-
-        Subject result = subjectRepository.findSubjectWithUserByEmail("test@mail.com");
-
-        // then
-        assertEquals("AI 전망", result.getKeyword());
-
-    }
-    
-    @Test
-    @DisplayName("Subject가_이미_등록되어_있으면_update")
+    @DisplayName("뉴스_토픽_리스트_조회하기")
     @Transactional
-    void UPDATE_SUBJECT_WHEN_SUBJECT_ALREADY_REGISTERED() throws Exception {
-        
-        // given
-        saveSubject();
-        SubjectRequest subjectRequest = new SubjectRequest("비트코인 전망");
-        String json = objectMapper.writeValueAsString(subjectRequest);
-        UserContext userContext = createUserContext();
-        String accessToken = jwtUtils.generateAccessToken(userContext);
-
-        // when
-        mockMvc.perform(post("/register/subject")
-                        .contentType(APPLICATION_JSON)
-                        .content(json)
-                        .header(AUTHORIZATION, accessToken)
-                )
-                .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
-                .andDo(print());
-
-        Subject result = subjectRepository.findSubjectWithUserByEmail("test@mail.com");
-
-        // then
-        assertEquals("비트코인 전망", result.getKeyword());
-    }
-
-    @Test
-    @DisplayName("부적절한_값을_등록_시_예외_발생")
-    void THROW_EXCEPTION_REQUEST_INVALID_SUBJECT() throws Exception {
+    void GET_NEWS_TOPIC_LIST() throws Exception {
 
         // given
-        SubjectRequest subjectRequest = new SubjectRequest("");
-        String json = objectMapper.writeValueAsString(subjectRequest);
         UserContext userContext = createUserContext();
         String accessToken = jwtUtils.generateAccessToken(userContext);
-
 
         // expected
-        mockMvc.perform(post("/register/subject")
-                        .contentType(APPLICATION_JSON)
-                        .content(json)
+        mockMvc.perform(get("/news?page=1&size=10")
                         .header(AUTHORIZATION, accessToken)
                 )
-                .andExpect(jsonPath("$.statusCode").value("ERROR"))
-                .andExpect(jsonPath("$.data[0].field").value("keyword"))
-                .andExpect(jsonPath("$.data[0].message").value("값을 입력해주세요."))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.items.length()").value(10))
+                .andExpect(jsonPath("$.data.items").isArray())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("뉴스_아이템_조회")
+    @Transactional
+    void GET_NEWS_ITEMS() throws Exception {
+
+        // given
+        UserContext userContext = createUserContext();
+        String accessToken = jwtUtils.generateAccessToken(userContext);
+
+        // expected
+        mockMvc.perform(get("/news/{newsId}", 1L)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.items").isArray())
+                .andExpect(jsonPath("$.data.items.length()").value(3))
                 .andDo(print());
     }
 }

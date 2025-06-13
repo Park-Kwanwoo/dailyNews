@@ -10,9 +10,13 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import static dev.park.dailynews.domain.social.SocialProvider.KAKAO;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class JwtUtilsTest {
 
     private JwtProperties jwtProperties = new JwtProperties(
@@ -30,7 +34,7 @@ public class JwtUtilsTest {
     void GENERATE_ACCESS_TOKEN() {
 
         // given
-        UserContext userContext = new UserContext("test@jwt.com", "test-uuid");
+        UserContext userContext = new UserContext("test@jwt.com", "test-uuid", "test-socialToken", KAKAO);
 
         // when
         String accessToken = jwtUtils.generateAccessToken(userContext);
@@ -50,7 +54,8 @@ public class JwtUtilsTest {
     void GENERATE_REFRESH_TOKEN() {
 
         // given
-        UserContext userContext = new UserContext("test@jwt.com", "test-uuid");
+        UserContext userContext = new UserContext("test@jwt.com", "test-uuid", "test-socialToken", KAKAO);
+
 
         // when
         String refreshToken = jwtUtils.generateRefreshToken(userContext);
@@ -69,7 +74,8 @@ public class JwtUtilsTest {
     void THROW_ExpiredException_WHEN_TOKEN_EXPIRED() throws InterruptedException {
 
         // given
-        UserContext userContext = new UserContext("test@jwt.com", "test-uuid");
+        UserContext userContext = new UserContext("test@jwt.com", "test-uuid", "test-socialToken", KAKAO);
+
 
         // when
         String accessToken = jwtUtils.generateAccessToken(userContext);
@@ -83,7 +89,6 @@ public class JwtUtilsTest {
     @DisplayName("유효하지_않은_형식의_토큰_MalformedJwtException_발생")
     void THROW_MalformedJwtException_WHEN_TOKEN_INVALID() throws InterruptedException {
 
-        // given
         // when
         String notJwtFormatToken = "not-a-valid-token";
 
@@ -96,7 +101,8 @@ public class JwtUtilsTest {
     void THROW_SignatureException_WHEN_WRONG_SIGNATURE() {
 
         // given
-        UserContext userContext = new UserContext("test@jwt.com", "test-uuid");
+        UserContext userContext = new UserContext("test@jwt.com", "test-uuid", "test-socialToken", KAKAO);
+
 
         // when
         JwtUtils wrongProvider = new JwtUtils(new JwtProperties(
