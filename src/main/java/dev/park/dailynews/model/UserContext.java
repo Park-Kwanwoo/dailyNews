@@ -18,12 +18,12 @@ public class UserContext {
     private final String socialToken;
     private final SocialProvider provider;
 
-    public static UserContext from(SocialUserInfoContext userInfo) {
+    public static UserContext from(User user, String socialToken) {
         return UserContext.builder()
                 .uuid(UUID.randomUUID().toString())
-                .email(userInfo.getEmail())
-                .socialToken(userInfo.getSocialToken())
-                .provider(userInfo.getProvider())
+                .email(user.getEmail())
+                .socialToken(socialToken)
+                .provider(user.getProvider())
                 .build();
     }
 }
