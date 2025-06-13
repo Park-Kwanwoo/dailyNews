@@ -5,6 +5,8 @@ import dev.park.dailynews.domain.social.KakaoUserInfo;
 import dev.park.dailynews.domain.social.SocialProvider;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLogoutParams;
+import dev.park.dailynews.exception.ExternalApiException;
+import dev.park.dailynews.exception.ExternalApiTimeoutException;
 import dev.park.dailynews.model.SocialUserInfoContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import static dev.park.dailynews.domain.social.SocialProvider.KAKAO;
@@ -38,13 +42,21 @@ public class KakaoClient implements SocialClient {
 
         HttpEntity<MultiValueMap<String, String>> tokenRequest = tokenRequest(params.getCode());
 
-        KakaoToken kakaoToken = rt.postForObject(
-                kakaoProperties.getTokenUrl(),
-                tokenRequest,
-                KakaoToken.class
-        );
+        try {
+            KakaoToken kakaoToken = rt.postForObject(
+                    kakaoProperties.getTokenUrl(),
+                    tokenRequest,
+                    KakaoToken.class
+            );
 
-        return kakaoToken.accessToken();
+            return kakaoToken.accessToken();
+        } catch (ResourceAccessException e) {
+            log.error("Kakao API 연결 실패", e);
+            throw new ExternalApiTimeoutException();
+        } catch (RestClientException e) {
+            log.error("Kakao API 요청 실패", e);
+            throw new ExternalApiException();
+        }
     }
 
     @Override
@@ -52,18 +64,27 @@ public class KakaoClient implements SocialClient {
 
         HttpEntity<MultiValueMap<String, String>> userInfoRequest = userInfoRequest(accessToken);
 
-        KakaoUserInfo kakaoUserInfo = rt.postForObject(
-                kakaoProperties.getUserInfoUrl(),
-                userInfoRequest,
-                KakaoUserInfo.class
-        );
+        try {
+            KakaoUserInfo kakaoUserInfo = rt.postForObject(
+                    kakaoProperties.getUserInfoUrl(),
+                    userInfoRequest,
+                    KakaoUserInfo.class
+            );
 
-        return SocialUserInfoContext.builder()
-                .email(kakaoUserInfo.getEmail())
-                .nickname(kakaoUserInfo.getNickname())
-                .provider(KAKAO)
-                .socialToken(accessToken)
-                .build();
+            return SocialUserInfoContext.builder()
+                    .email(kakaoUserInfo.getEmail())
+                    .nickname(kakaoUserInfo.getNickname())
+                    .provider(KAKAO)
+                    .socialToken(accessToken)
+                    .build();
+
+        } catch (ResourceAccessException e) {
+            log.error("Kakao API 연결 실패", e);
+            throw new ExternalApiTimeoutException();
+        } catch (RestClientException e) {
+            log.error("Kakao API 요청 실패", e);
+            throw new ExternalApiException();
+        }
     }
 
     @Override
@@ -71,13 +92,20 @@ public class KakaoClient implements SocialClient {
 
         HttpEntity<MultiValueMap<String, String>> logoutRequest = logoutRequest(params.getToken());
 
-        String id = rt.postForObject(
-                kakaoProperties.getLogoutUrl(),
-                logoutRequest,
-                String.class
-        );
+        try {
+            String kakaoUserId = rt.postForObject(
+                    kakaoProperties.getLogoutUrl(),
+                    logoutRequest,
+                    String.class
+            );
 
-        log.info("{}", id);
+        } catch (ResourceAccessException e) {
+            log.error("Kakao API 연결 실패", e);
+            throw new ExternalApiTimeoutException();
+        } catch (RestClientException e) {
+            log.error("Kakao API 요청 실패", e);
+            throw new ExternalApiException();
+        }
     }
 
     private HttpEntity<MultiValueMap<String, String>> tokenRequest(String code) {

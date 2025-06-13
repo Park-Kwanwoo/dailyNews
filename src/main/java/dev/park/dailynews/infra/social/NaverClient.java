@@ -3,19 +3,20 @@ package dev.park.dailynews.infra.social;
 import dev.park.dailynews.domain.social.NaverToken;
 import dev.park.dailynews.domain.social.NaverUserInfo;
 import dev.park.dailynews.domain.social.SocialProvider;
-import dev.park.dailynews.domain.social.SocialUserInfo;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLogoutParams;
+import dev.park.dailynews.exception.ExternalApiException;
+import dev.park.dailynews.exception.ExternalApiTimeoutException;
 import dev.park.dailynews.model.SocialUserInfoContext;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
@@ -38,13 +39,21 @@ public class NaverClient implements SocialClient {
 
         HttpEntity<MultiValueMap<String, String>> request = tokenRequest(params.getCode());
 
-        NaverToken naverToken = rt.postForObject(
-                naverProperties.getTokenUrl(),
-                request,
-                NaverToken.class
-                );
+        try {
+            NaverToken naverToken = rt.postForObject(
+                    naverProperties.getTokenUrl(),
+                    request,
+                    NaverToken.class
+            );
 
-        return naverToken.accessToken();
+            return naverToken.accessToken();
+        } catch (ResourceAccessException e) {
+            log.error("Kakao API 연결 실패", e);
+            throw new ExternalApiTimeoutException();
+        } catch (RestClientException e) {
+            log.error("Kakao API 요청 실패", e);
+            throw new ExternalApiException();
+        }
     }
 
     @Override
@@ -52,18 +61,26 @@ public class NaverClient implements SocialClient {
 
         HttpEntity<MultiValueMap<String, String>> request = userInfoRequest(accessToken);
 
-        NaverUserInfo naverUserInfo = rt.postForObject(
-                naverProperties.getUserInfoUrl(),
-                request,
-                NaverUserInfo.class
-        );
-        return SocialUserInfoContext.builder()
-                .id(naverUserInfo.getId())
-                .email(naverUserInfo.getEmail())
-                .nickname(naverUserInfo.getNickname())
-                .provider(NAVER)
-                .socialToken(accessToken)
-                .build();
+        try {
+            NaverUserInfo naverUserInfo = rt.postForObject(
+                    naverProperties.getUserInfoUrl(),
+                    request,
+                    NaverUserInfo.class
+            );
+            return SocialUserInfoContext.builder()
+                    .id(naverUserInfo.getId())
+                    .email(naverUserInfo.getEmail())
+                    .nickname(naverUserInfo.getNickname())
+                    .provider(NAVER)
+                    .socialToken(accessToken)
+                    .build();
+        } catch (ResourceAccessException e) {
+            log.error("Kakao API 연결 실패", e);
+            throw new ExternalApiTimeoutException();
+        } catch (RestClientException e) {
+            log.error("Kakao API 요청 실패", e);
+            throw new ExternalApiException();
+        }
     }
 
     @Override
@@ -71,14 +88,21 @@ public class NaverClient implements SocialClient {
 
         HttpEntity<MultiValueMap<String, String>> logoutRequest = logoutRequest(params);
 
-        Object o = rt.postForObject(
-                naverProperties.getTokenUrl(),
-                logoutRequest,
-                Object.class
-        );
+        try {
+            Object o = rt.postForObject(
+                    naverProperties.getTokenUrl(),
+                    logoutRequest,
+                    Object.class
+            );
 
-        log.info("{}", o);
-
+            log.info("{}", o);
+        } catch (ResourceAccessException e) {
+            log.error("Kakao API 연결 실패", e);
+            throw new ExternalApiTimeoutException();
+        } catch (RestClientException e) {
+            log.error("Kakao API 요청 실패", e);
+            throw new ExternalApiException();
+        }
     }
 
     private HttpEntity<MultiValueMap<String, String>> tokenRequest(String code) {
