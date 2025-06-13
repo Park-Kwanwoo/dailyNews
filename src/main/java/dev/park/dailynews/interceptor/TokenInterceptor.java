@@ -27,7 +27,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
 
         if (request.getRequestURI().equals("/social/logout")) {
-            CookieUtils.setAccessToken(response, accessToken);
+            request.setAttribute("accessToken", accessToken);
         }
 
         return HandlerInterceptor.super.preHandle(request, response, handler);

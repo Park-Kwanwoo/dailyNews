@@ -24,7 +24,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/news",
                         "/news/{newsId}",
                         "/register/subject",
-                        "/subject"
+                        "/subject",
+                        "/social/logout"
                 );
     }
     @Override

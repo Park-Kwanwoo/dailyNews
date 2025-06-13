@@ -18,10 +18,6 @@ public class CookieUtils {
         response.addHeader(SET_COOKIE, setRefreshToken("refreshToken", token));
     }
 
-    public static void setAccessToken(HttpServletResponse response, String token) {
-        response.addHeader(SET_COOKIE, setRefreshToken("accessToken", token));
-    }
-
     public static void setAuthorization(HttpServletResponse response, String token) {
         response.addHeader(AUTHORIZATION, token);
     }

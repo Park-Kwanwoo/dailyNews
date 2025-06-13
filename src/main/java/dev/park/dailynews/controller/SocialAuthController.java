@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,8 +32,7 @@ public class SocialAuthController {
     }
 
     @PostMapping("/social/logout")
-    public ApiResponse<Void> socialLogout(HttpServletRequest request) {
-        String accessToken = CookieUtils.extractCookieValue("accessToken", request);
+    public ApiResponse<Void> socialLogout(@RequestAttribute("accessToken") String accessToken) {
         socialAuthService.logout(accessToken);
         return ApiResponse.successWithNoContent();
     }
