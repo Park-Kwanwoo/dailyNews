@@ -11,11 +11,19 @@ import java.time.Duration;
 @Configuration
 public class DailyNewsConfig {
 
-    @Bean
-    public RestTemplate restTemplate() {
+    @Bean("socialRestTemplate")
+    public RestTemplate socialRestTemplate() {
         return new RestTemplateBuilder()
                 .setConnectTimeout(Duration.ofSeconds(5))
                 .setReadTimeout(Duration.ofSeconds(5))
+                .build();
+    }
+
+    @Bean("aiRestTemplate")
+    public RestTemplate aiRestTemplate() {
+        return new RestTemplateBuilder()
+                .setConnectTimeout(Duration.ofSeconds(60))
+                .setReadTimeout(Duration.ofSeconds(60))
                 .build();
     }
 

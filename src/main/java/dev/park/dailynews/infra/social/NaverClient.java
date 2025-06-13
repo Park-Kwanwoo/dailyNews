@@ -10,6 +10,7 @@ import dev.park.dailynews.exception.ExternalApiTimeoutException;
 import dev.park.dailynews.model.SocialUserInfoContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -23,11 +24,15 @@ import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class NaverClient implements SocialClient {
 
     private final NaverProperties naverProperties;
     private final RestTemplate rt;
+
+    public NaverClient(NaverProperties naverProperties, @Qualifier("socialRestTemplate") RestTemplate rt) {
+        this.naverProperties = naverProperties;
+        this.rt = rt;
+    }
 
     @Override
     public SocialProvider socialProvider() {

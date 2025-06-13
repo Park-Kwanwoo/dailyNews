@@ -7,6 +7,7 @@ import dev.park.dailynews.domain.news.NewsParse;
 import dev.park.dailynews.domain.news.NewsResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -24,14 +25,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class CustomOpenAIClient {
 
     private final OpenAIProperties openAIProperties;
-
     private final ObjectMapper objectMapper;
-
     private final RestTemplate rt;
+
+    public CustomOpenAIClient(OpenAIProperties openAIProperties, ObjectMapper objectMapper, @Qualifier("aiRestTemplate") RestTemplate rt) {
+        this.openAIProperties = openAIProperties;
+        this.objectMapper = objectMapper;
+        this.rt = rt;
+    }
 
     public NewsParse post(String keyword) {
         NewsResult response = rt.postForObject(

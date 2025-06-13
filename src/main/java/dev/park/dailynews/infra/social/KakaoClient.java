@@ -10,6 +10,7 @@ import dev.park.dailynews.exception.ExternalApiTimeoutException;
 import dev.park.dailynews.model.SocialUserInfoContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -24,13 +25,16 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class KakaoClient implements SocialClient {
 
     private final KakaoProperties kakaoProperties;
-
     private final RestTemplate rt;
+
+    public KakaoClient(KakaoProperties kakaoProperties, @Qualifier("socialRestTemplate") RestTemplate rt) {
+        this.kakaoProperties = kakaoProperties;
+        this.rt = rt;
+    }
 
     @Override
     public SocialProvider socialProvider() {
