@@ -8,7 +8,7 @@ on:
 jobs:
   build:
 
-    if: ${{ !contains(github.event.head_commit.messages, '[skip]') }}
+    if: ${{ !contains(github.event.head_commit.messages, '[skip]') || !contains(github.event.head_commit.messages, '[test]') }}
     runs-on: self-hosted
 
     strategy:
@@ -52,13 +52,7 @@ jobs:
       ## OpenAI.json 파일 셋
       - name: Set OpenAI json
         id: OpenAI-Generator
-        run: |
-          echo ${{ secrets.OPEN_AI_JSON }} | base64 --decode >> src/main/resources/OpenAI.json
-          echo "key=${{ secrets.OPEN_AI_JSON }} | base64 --decode" >> $GITHUB_OUTPUT
-
-      ## OpenAI.json 파일 echo 테스트
-      - name: OpenAI.json echo test
-        run: echo ${{ steps.OpenAI-Generator.outputs.key }}
+        run: echo ${{ secrets.OPEN_AI_JSON }} | base64 --decode >> src/main/resources/OpenAI.json
 
       ## JDK 셋업
       - name: Set up JDK 17
