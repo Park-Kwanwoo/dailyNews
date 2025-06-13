@@ -8,7 +8,6 @@ import dev.park.dailynews.dto.request.PagingRequest;
 import dev.park.dailynews.dto.response.common.PagingResponse;
 import dev.park.dailynews.dto.response.news.NewsDetailResponse;
 import dev.park.dailynews.dto.response.news.NewsResponse;
-import dev.park.dailynews.exception.InvalidUserInfoException;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.infra.openai.CustomOpenAIClient;
 import dev.park.dailynews.repository.news.NewsRepository;
@@ -37,7 +36,6 @@ public class NewsService {
         for (User user : users) {
             try {
                 createNews(user.getSubject().getKeyword(), user.getId());
-
             } catch (Exception e) {
                 log.error("뉴스 생성 실패 = {}", user.getEmail(), e);
             }
@@ -80,11 +78,8 @@ public class NewsService {
         User savedUser = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        News newsWithItems = newsRepository.findWithItemsBy(newsId);
-
-        if (!savedUser.getId().equals(newsWithItems.getUser().getId())) {
-            throw new InvalidUserInfoException();
-        }
+        Long userId = savedUser.getId();
+        News newsWithItems = newsRepository.findNewsWithItemsByNewsIdAndUserId(newsId, userId);
 
         return NewsDetailResponse.from(newsWithItems);
     }
