@@ -13,7 +13,7 @@ public class SubjectRepositoryImpl implements SubjectRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Subject findByUserEmail(String email) {
+    public Subject findSubjectWithUserByEmail(String email) {
 
         return jpaQueryFactory.selectFrom(subject)
                 .innerJoin(subject.user, user)

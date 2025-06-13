@@ -15,7 +15,6 @@ import java.util.List;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final TokenInterceptor tokenInterceptor;
-    private final SessionInfoResolver sessionInfoResolver;
     private final UserInfoResolver userInfoResolver;
 
     @Override
@@ -25,8 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/news",
                         "/news/{newsId}",
                         "/register/subject",
-                        "/subject",
-                        "/social/logout"
+                        "/subject"
                 );
     }
     @Override
@@ -45,6 +43,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     private List<HandlerMethodArgumentResolver> resolvers() {
-        return List.of(sessionInfoResolver, userInfoResolver);
+        return List.of(userInfoResolver);
     }
 }
