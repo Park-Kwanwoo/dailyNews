@@ -7,6 +7,8 @@ import dev.park.dailynews.domain.news.NewsParse;
 import dev.park.dailynews.domain.news.NewsResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -54,7 +57,9 @@ public class CustomOpenAIClient {
         headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
         headers.add(AUTHORIZATION, "Bearer " + openAIProperties.getOpenaiKey());
         try {
-            ObjectNode objectNode = objectMapper.readTree(new File("src/main/resources/OpenAI.json")).deepCopy();
+            Resource resource = new ClassPathResource("OpenAI.json");
+            InputStream inputStream = resource.getInputStream();
+            ObjectNode objectNode = objectMapper.readTree(inputStream).deepCopy();
             objectNode.put("input", keyword);
             return new HttpEntity<>(objectNode, headers);
         } catch (IOException e) {
