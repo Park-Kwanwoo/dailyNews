@@ -99,8 +99,6 @@ public class NaverClient implements SocialClient {
                     logoutRequest,
                     Object.class
             );
-
-            log.info("{}", o);
         } catch (ResourceAccessException e) {
             log.error("Kakao API 연결 실패", e);
             throw new ExternalApiTimeoutException();
@@ -140,7 +138,7 @@ public class NaverClient implements SocialClient {
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "delete");
+        body.add("grant_type", naverProperties.getDeleteGrantType());
         body.add("client_id", naverProperties.getClientId());
         body.add("client_secret", naverProperties.getClientSecret());
         body.add("access_token", params.getToken());

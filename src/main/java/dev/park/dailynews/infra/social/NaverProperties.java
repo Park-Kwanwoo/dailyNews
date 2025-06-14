@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class NaverProperties {
 
     private final String grantType;
+    private final String deleteGrantType;
     private final String clientId;
     private final String clientSecret;
     private final String tokenUrl;

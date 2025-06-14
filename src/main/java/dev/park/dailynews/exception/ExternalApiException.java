@@ -1,6 +1,8 @@
 package dev.park.dailynews.exception;
 
-public class ExternalApiException extends DailyNewsException {
+import org.springframework.web.client.RestClientException;
+
+public class ExternalApiException extends RestClientException {
 
     private static final String MESSAGE = "요청에 실패했습니다.";
 
