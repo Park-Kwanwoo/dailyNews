@@ -31,20 +31,21 @@ jwt:
 
 social:
   kakao:
-    grant-type: test-authorization-code
-    client-id: test-client-id
-    client-secret: test-client-secret
-    redirect-uri: http://localhost:80/social/test
-    token-url: http://localhost:80/oauth/token
-    user-info-url: http://localhost:80/v2/user/me
-    logout-url: http://localhost:80/v1/user/logout
+    grant-type: authorization-code
+    client-id: kakao-client-id
+    client-secret: kakao-client-secret
+    redirect-uri: http://localhost:8090/social/test
+    token-url: http://localhost:8090/oauth/token
+    user-info-url: http://localhost:8090/v2/user/me
+    logout-url: http://localhost:8090/v1/user/logout
   naver:
-    grant-type: test-authorization_code
-    client-id: test-client-id
-    client-secret: test-client-secret
-    token-url: http://localhost:80/oauth2.0/token
-    user-info-url: http://localhost:80/v1/nid/me
+    grant-type: authorization_code
+    client-id: naver-client-id
+    client-secret: naver-client-secret
+    token-url: http://localhost:8090/oauth2.0/token
+    user-info-url: http://localhost:8090/v1/nid/me
+    delete-grant-type: delete
 
 openai:
   openai-key: test-openai-key
-  openai-response-url: http://localhost:80/v1/responses
+  openai-response-url: http://localhost:8090/v1/responses
