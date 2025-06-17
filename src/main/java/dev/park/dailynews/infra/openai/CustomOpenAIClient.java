@@ -47,12 +47,10 @@ public class CustomOpenAIClient {
         String arguments = response.output().get(0).arguments();
         try {
             NewsParse newsParse = objectMapper.readValue(arguments, NewsParse.class);
-            log.info("{}", newsParse);
             return newsParse;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage());
         }
-
     }
 
     private HttpEntity<Object> request(String keyword) {
