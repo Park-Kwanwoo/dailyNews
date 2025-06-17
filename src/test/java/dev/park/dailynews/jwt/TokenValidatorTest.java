@@ -2,10 +2,9 @@ package dev.park.dailynews.jwt;
 
 import dev.park.dailynews.exception.ExpiredTokenException;
 import dev.park.dailynews.exception.InvalidTokenException;
-import dev.park.dailynews.infra.auth.jwt.JwtProperties;
+import dev.park.dailynews.exception.TokenBlacklistException;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
 import dev.park.dailynews.infra.auth.jwt.TokenValidator;
-import dev.park.dailynews.service.TokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -34,7 +35,7 @@ public class TokenValidatorTest {
     private JwtUtils jwtUtils;
 
     @Test
-    @DisplayName("토큰과_세션이_유효한_경우_true_반환")
+    @DisplayName("토큰이_유효한_경우_true_반환")
     void RETURN_TRUE_WHEN_TOKEN_AND_SESSION_VALID() {
 
         // given
@@ -72,12 +73,29 @@ public class TokenValidatorTest {
     void THROWS_ExpiredTokenException_WHEN_TOKEN_EXPIRED() {
 
         // given
-        String mockToken = "mock-token";
+        String fakeToken = "fake-token";
 
-        given(jwtUtils.isValidIssuer(mockToken)).willThrow(ExpiredJwtException.class);
+        given(jwtUtils.isValidIssuer(fakeToken)).willThrow(ExpiredJwtException.class);
 
         // expected
-        assertThrows(ExpiredTokenException.class, () -> tokenValidator.validToken(mockToken));
+        assertThrows(ExpiredTokenException.class, () -> tokenValidator.validToken(fakeToken));
 
+    }
+
+    @Test
+    @DisplayName("블랙리스트_토큰으로_요청_시_예외_발생")
+    void THROWS_TokenBlacklistException() {
+
+        // given
+        String fakeBlacklistToken = "fake-black-list-token";
+        ValueOperations mockValueOperations = mock(ValueOperations.class);
+
+        given(redisTemplate.opsForValue()).willReturn(mockValueOperations);
+        given(mockValueOperations.get(fakeBlacklistToken)).willReturn(true);
+
+        // expected
+        assertThatThrownBy(() -> tokenValidator.validToken(fakeBlacklistToken))
+                .isInstanceOf(TokenBlacklistException.class)
+                .hasMessage("로그아웃된 토큰 정보입니다.");
     }
 }
