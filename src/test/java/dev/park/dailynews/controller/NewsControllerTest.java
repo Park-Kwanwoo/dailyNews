@@ -5,7 +5,6 @@ import dev.park.dailynews.domain.news.News;
 import dev.park.dailynews.domain.news.NewsItem;
 import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
-import dev.park.dailynews.exception.TokenNotFoundException;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
 import dev.park.dailynews.model.UserContext;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,6 @@ import java.util.stream.IntStream;
 
 import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.USER_AGENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,9 +37,6 @@ public class NewsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private UserRepository userRepository;
@@ -115,9 +109,6 @@ public class NewsControllerTest {
 
     @BeforeEach
     void setUpAndClean() {
-        userRepository.deleteAll();
-        subjectRepository.deleteAll();
-        newsRepository.deleteAll();
         saveUser();
         saveSubject();
         saveNewsList();
