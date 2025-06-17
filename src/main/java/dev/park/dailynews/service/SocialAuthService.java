@@ -49,7 +49,7 @@ public class SocialAuthService {
 
     public TokenResponse login(SocialLoginParams params) {
 
-        SocialUserInfoContext userInfo = clientService.login(params);
+        SocialUserInfoContext userInfo = clientService.getUserInfo(params);
         UserContext userContext = findOrCreateUser(userInfo);
         String accessToken = jwtUtils.generateAccessToken(userContext);
         String refreshToken = jwtUtils.generateRefreshToken(userContext);

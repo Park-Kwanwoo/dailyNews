@@ -22,7 +22,7 @@ public class SocialClientService {
                 .collect(Collectors.toUnmodifiableMap(SocialClient::socialProvider, Function.identity()));
     }
 
-    public SocialUserInfoContext login(SocialLoginParams params) {
+    public SocialUserInfoContext getUserInfo(SocialLoginParams params) {
 
         SocialClient client = clients.get(params.getSocialProvider());
         String accessToken = client.requestAccessToken(params);
