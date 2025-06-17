@@ -65,7 +65,7 @@ class SocialClientServiceTest {
         given(kakaoClient.requestUserInfo(fakeKakaoToken)).willReturn(kakaoContext);
 
         // when
-        SocialUserInfoContext socialUserInfoContext = socialClientService.login(params);
+        SocialUserInfoContext socialUserInfoContext = socialClientService.getUserInfo(params);
 
         // then
         verify(kakaoClient, times(1)).socialProvider();
@@ -104,7 +104,7 @@ class SocialClientServiceTest {
         given(naverClient.requestUserInfo(fakeNaverToken)).willReturn(naverContext);
 
         // when
-        SocialUserInfoContext socialUserInfoContext = socialClientService.login(params);
+        SocialUserInfoContext socialUserInfoContext = socialClientService.getUserInfo(params);
 
         // then
         assertEquals(NAVER, socialUserInfoContext.getProvider());

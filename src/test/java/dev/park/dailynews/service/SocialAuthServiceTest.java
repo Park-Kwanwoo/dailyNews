@@ -58,7 +58,7 @@ public class SocialAuthServiceTest {
         SocialUserInfoContext mockUserInfo = SocialUserInfoContext.builder().email("test@mail.com").build();
 
         // given
-        given(socialClientService.login(any(SocialLoginParams.class))).willReturn(mockUserInfo);
+        given(socialClientService.getUserInfo(any(SocialLoginParams.class))).willReturn(mockUserInfo);
         given(userRepository.findByEmail(anyString())).willReturn(Optional.empty());
         given(userRepository.save(any(User.class))).willAnswer(i -> i.getArgument(0));
         given(jwtUtils.generateAccessToken(any(UserContext.class))).willReturn(mockAccessToken);
@@ -84,7 +84,7 @@ public class SocialAuthServiceTest {
         SocialUserInfoContext mockUserInfo = SocialUserInfoContext.builder().email("test@mail.com").build();
 
         // given
-        given(socialClientService.login(any(NaverLoginParams.class))).willReturn(mockUserInfo);
+        given(socialClientService.getUserInfo(any(NaverLoginParams.class))).willReturn(mockUserInfo);
         given(userRepository.findByEmail(anyString())).willReturn(Optional.empty());
         given(userRepository.save(any(User.class))).willAnswer(i -> i.getArgument(0));
         given(jwtUtils.generateAccessToken(any(UserContext.class))).willReturn(mockAccessToken);
