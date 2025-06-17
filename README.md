@@ -22,7 +22,7 @@ Vue 기반의 프론트엔드와 Spring Boot 기반 백엔드가 Docker로 컨�
 
 ---
 
-![배포 아키텍처](infra-flow.png)
+![배포 아키텍처](https://private-user-images.githubusercontent.com/77375127/456060153-634a1d60-461e-47cd-8930-65bbc3b2daa1.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTAxNzI0MjMsIm5iZiI6MTc1MDE3MjEyMywicGF0aCI6Ii83NzM3NTEyNy80NTYwNjAxNTMtNjM0YTFkNjAtNDYxZS00N2NkLTg5MzAtNjViYmMzYjJkYWExLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTA2MTclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNjE3VDE0NTUyM1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTgyM2I3ZGYwYzE2MDA5MThmMjYzOWRkYzVmZGRkMTZiZGMyZmNlNjQ5ZTIzMjkyYmZmZTFkNGI3NTkwODBkOGUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.NB1U9qFtMqJ8Yk-lG58IRGjJv5Iu-XOxCw97ej4Oe-I)
 
 ---
 
