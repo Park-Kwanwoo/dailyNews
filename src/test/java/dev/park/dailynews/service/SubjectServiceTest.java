@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,7 +34,7 @@ class SubjectServiceTest {
     private UserRepository userRepository;
 
     @Test
-    @DisplayName("등록된_주제가_없을때_새로운_주제_등록_성공")
+    @DisplayName("새로운_주제_등록")
     void REGISTER_SUBJECT() {
 
         // given
@@ -40,38 +42,35 @@ class SubjectServiceTest {
         LoginUserContext loginUserContext = new LoginUserContext("test@mail.com");
         User mockUser = mock(User.class);
 
-        given(subjectRepository.existsSubjectByUserEmail(argThat(s ->  s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(false);
-        given(userRepository.findByEmailWithSubjectLeftJoin(argThat(s ->  s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(mockUser);
+        given(userRepository.findByEmail(argThat(s ->  s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(Optional.of(mockUser));
 
         // when
-        subjectService.register(subjectRequest, loginUserContext);
+        subjectService.save(subjectRequest, loginUserContext);
 
         // then
-        verify(subjectRepository, times(1)).existsSubjectByUserEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
-        verify(userRepository, times(1)).findByEmailWithSubjectLeftJoin(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
+        verify(userRepository, times(1)).findByEmail(argThat(s ->  s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
+        verify(subjectRepository, times(1)).save(any(Subject.class));
 
     }
 
     @Test
-    @DisplayName("등록된_주제가_있을_경우_주제_업데이트")
+    @DisplayName("주제_업데이트")
     void UPDATE_SUBJECT() {
 
         // given
         SubjectRequest subjectRequest = new SubjectRequest("비트코인 전망");
         LoginUserContext loginUserContext = new LoginUserContext("test@mail.com");
         Subject savedSubject = Subject.builder().keyword("AI 전망").build();
-        given(subjectRepository.existsSubjectByUserEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(true);
-        given(subjectRepository.findSubjectWithUserByEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(savedSubject);
+
+        given(subjectRepository.findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(savedSubject);
 
         // when
-        subjectService.register(subjectRequest, loginUserContext);
+        subjectService.update(subjectRequest, loginUserContext);
 
         // then
-        verify(subjectRepository, times(1)).existsSubjectByUserEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
-        verify(subjectRepository, times(1)).findSubjectWithUserByEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
+        verify(subjectRepository, times(1)).findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
 
         assertEquals("비트코인 전망", savedSubject.getKeyword());
-
     }
 
     @Test
@@ -81,7 +80,7 @@ class SubjectServiceTest {
         // given
         Subject mockSubject = Subject.builder().keyword("비트코인 전망").build();
         LoginUserContext userContext = new LoginUserContext("test@mail.com");
-        given(subjectRepository.findSubjectWithUserByEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$"))))
+        given(subjectRepository.findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$"))))
                 .willReturn(mockSubject);
 
         // when
@@ -89,7 +88,7 @@ class SubjectServiceTest {
 
         // then
         assertEquals("비트코인 전망", subjectResponse.keyword());
-        verify(subjectRepository, times(1)).findSubjectWithUserByEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
+        verify(subjectRepository, times(1)).findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
     }
 
     @Test
@@ -97,7 +96,7 @@ class SubjectServiceTest {
     void RESPONSE_EMPTY_SUBJECT() {
 
         // given
-        given(subjectRepository.findSubjectWithUserByEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$"))))
+        given(subjectRepository.findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$"))))
                 .willReturn(null);
         LoginUserContext userContext = new LoginUserContext("test@mail.com");
 
@@ -106,6 +105,6 @@ class SubjectServiceTest {
 
         // then
         assertEquals("", subjectResponse.keyword());
-        verify(subjectRepository, times(1)).findSubjectWithUserByEmail(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
+        verify(subjectRepository, times(1)).findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));
     }
 }

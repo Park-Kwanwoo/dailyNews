@@ -23,6 +23,7 @@ import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -56,7 +57,6 @@ class SubjectControllerTest {
 
     @BeforeEach
     void clean() {
-        userRepository.deleteAll();
         saveUser();
     }
 
@@ -103,7 +103,7 @@ class SubjectControllerTest {
         String accessToken = jwtUtils.generateAccessToken(userContext);
 
         // when
-        mockMvc.perform(post("/register/subject")
+        mockMvc.perform(post("/subject")
                         .contentType(APPLICATION_JSON)
                         .content(json)
                         .header(AUTHORIZATION, accessToken)
@@ -111,7 +111,7 @@ class SubjectControllerTest {
                 .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
                 .andDo(print());
 
-        Subject result = subjectRepository.findSubjectWithUserByEmail("test@mail.com");
+        Subject result = subjectRepository.findSubjectByUser("test@mail.com");
 
         // then
         assertEquals("AI 전망", result.getKeyword());
@@ -131,7 +131,7 @@ class SubjectControllerTest {
         String accessToken = jwtUtils.generateAccessToken(userContext);
 
         // when
-        mockMvc.perform(post("/register/subject")
+        mockMvc.perform(patch("/subject")
                         .contentType(APPLICATION_JSON)
                         .content(json)
                         .header(AUTHORIZATION, accessToken)
@@ -139,7 +139,7 @@ class SubjectControllerTest {
                 .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
                 .andDo(print());
 
-        Subject result = subjectRepository.findSubjectWithUserByEmail("test@mail.com");
+        Subject result = subjectRepository.findSubjectByUser("test@mail.com");
 
         // then
         assertEquals("비트코인 전망", result.getKeyword());
@@ -157,7 +157,7 @@ class SubjectControllerTest {
 
 
         // expected
-        mockMvc.perform(post("/register/subject")
+        mockMvc.perform(post("/subject")
                         .contentType(APPLICATION_JSON)
                         .content(json)
                         .header(AUTHORIZATION, accessToken)
