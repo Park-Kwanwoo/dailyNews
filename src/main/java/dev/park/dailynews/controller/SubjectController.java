@@ -7,10 +7,7 @@ import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.service.SubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,16 +15,22 @@ public class SubjectController {
 
     private final SubjectService subjectService;
 
-    @PostMapping("/register/subject")
-    public ApiResponse<?> registerSubject(@RequestBody @Valid SubjectRequest subject, LoginUserContext user) {
-        subjectService.register(subject, user);
+    @PostMapping("/subject")
+    public ApiResponse<?> save(@RequestBody @Valid SubjectRequest subject, LoginUserContext user) {
+        subjectService.save(subject, user);
         return ApiResponse.successWithNoContent();
     }
 
     @GetMapping("/subject")
-    public ApiResponse<SubjectResponse> getSubjects(LoginUserContext user) {
+    public ApiResponse<SubjectResponse> get(LoginUserContext userContext) {
 
-        SubjectResponse subject = subjectService.getSubject(user);
-        return ApiResponse.successWithContent(subject);
+        SubjectResponse subjectResponse = subjectService.getSubject(userContext);
+        return ApiResponse.successWithContent(subjectResponse);
+    }
+
+    @PatchMapping("/subject")
+    public ApiResponse<SubjectResponse> update(@RequestBody @Valid SubjectRequest subjectRequest, LoginUserContext userContext) {
+        SubjectResponse subjectResponse = subjectService.update(subjectRequest, userContext);
+        return ApiResponse.successWithContent(subjectResponse);
     }
 }
