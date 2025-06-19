@@ -15,19 +15,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-
-    @Override
-    public User findByEmailWithSubjectLeftJoin(String email) {
-
-        User savedUser = jpaQueryFactory.selectFrom(user)
-                .leftJoin(user.subject, subject)
-                .fetchJoin()
-                .where(user.email.eq(email))
-                .fetchOne();
-
-        return savedUser;
-    }
-
     @Override
     public List<User> findAllWithSubject() {
 
