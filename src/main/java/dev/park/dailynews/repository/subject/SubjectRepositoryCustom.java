@@ -4,5 +4,5 @@ import dev.park.dailynews.domain.subject.Subject;
 
 public interface SubjectRepositoryCustom {
 
-    Subject findSubjectWithUserByEmail(String email);
+    Subject findSubjectByUser(String email);
 }

@@ -7,7 +7,4 @@ import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long>, SubjectRepositoryCustom {
 
-    boolean existsSubjectByUserEmail(String email);
-
-    Optional<Subject> findSubjectByUserEmail(String email);
 }

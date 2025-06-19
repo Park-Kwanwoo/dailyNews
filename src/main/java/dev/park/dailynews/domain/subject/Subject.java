@@ -21,8 +21,7 @@ public class Subject {
 
     private String keyword;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "user_email", referencedColumnName = "email")
+    @OneToOne(mappedBy = "subject")
     private User user;
 
     @Builder

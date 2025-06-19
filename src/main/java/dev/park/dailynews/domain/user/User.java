@@ -1,23 +1,25 @@
 package dev.park.dailynews.domain.user;
 
 import dev.park.dailynews.domain.news.News;
-import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.social.SocialProvider;
+import dev.park.dailynews.domain.subject.Subject;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity(name = "USERS")
 @NoArgsConstructor(access = PROTECTED)
 @Getter
-@ToString(exclude = {"subject", "news"})
-@EqualsAndHashCode(exclude = {"subject", "news"})
+@ToString(exclude = {"news"})
+@EqualsAndHashCode(exclude = {"news"})
 public class User {
 
     @Id
@@ -32,7 +34,7 @@ public class User {
     @Enumerated(value = STRING)
     private SocialProvider provider;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(cascade = ALL, fetch = LAZY)
     private Subject subject;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
