@@ -14,7 +14,10 @@ function logout() {
 <template>
   <ul class="menus">
     <li class="menu">
-      <router-link to="/subjects" v-if="isLoggedIn">주제 변경</router-link>
+      <router-link to="/main" v-if="isLoggedIn">메인</router-link>
+    </li>
+    <li class="menu">
+      <router-link to="/subjects" v-if="isLoggedIn">주제변경</router-link>
     </li>
     <li class="menu">
       <el-button to="/" v-if="isLoggedIn" @click="logout">로그아웃</el-button>

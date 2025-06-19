@@ -9,10 +9,10 @@ import router from '@/router'
 export default class SubjectRepository {
   constructor(@inject(HttpRepository) private readonly httpRepository: HttpRepository) {}
 
-  public registerSubject(request: SubjectRequest, auth: string | null) {
+  public save(request: SubjectRequest, auth: string | null) {
     return this.httpRepository
       .post({
-        path: '/register/subject',
+        path: '/subject',
         body: request,
         method: 'POST',
         headers: {
@@ -42,6 +42,25 @@ export default class SubjectRepository {
       )
       .then((r) => {
         return r
+      })
+  }
+
+  public update(request: SubjectRequest, auth: string | null) {
+    return this.httpRepository
+      .patch({
+        method: 'PATCH',
+        path: '/subject',
+        body: request,
+        headers: {
+          Authorization: auth,
+        },
+      })
+      .then((r) => {
+        const statusCode = r.statusCode
+        if (statusCode == 'SUCCESS') router.go(0)
+      })
+      .catch((e) => {
+        ElMessage.error('주제가 수정되지 않았습니다. 다시 시도해주세요')
       })
   }
 }
