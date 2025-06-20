@@ -9,6 +9,8 @@ import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
 import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.exception.UserNotFoundException;
+import dev.park.dailynews.infra.auth.jwt.JwtUtils;
+import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.repository.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import wiremock.org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
@@ -26,9 +29,11 @@ import static dev.park.dailynews.domain.social.SocialProvider.KAKAO;
 import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,6 +54,9 @@ class SocialAuthControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Test
     @DisplayName("카카오_소셜_로그인_성공_및_회원가입")
@@ -146,6 +154,32 @@ class SocialAuthControllerTest {
         assertEquals("naver", savedUser.getNickname());
         assertThat(userRepository.count()).isEqualTo(1L);
     }
+
+    @Test
+    @DisplayName("소셜_회원_정보_가져오기")
+    void GET_SOCIAL_USER_INFO() throws Exception {
+
+        // given
+        User user = User.builder()
+                .email("kakao@mail.com")
+                .nickname("카카오")
+                .provider(KAKAO)
+                .build();
+
+        User savedUser = userRepository.save(user);
+        UserContext userContext = UserContext.from(savedUser, "kakao-token");
+        String accessToken = jwtUtils.generateAccessToken(userContext);
+
+        // expected
+        mockMvc.perform(get("/social/info")
+                        .header(AUTHORIZATION, accessToken))
+                .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.nickname").value("카카오"))
+                .andExpect(jsonPath("$.data.email").value("kakao@mail.com"))
+                .andExpect(jsonPath("$.data.provider").value("KAKAO"))
+                .andDo(print());
+    }
+
 
     @Test
     @DisplayName("카카오_소셜_로그인_토큰_요청_타임_아웃_발생")
