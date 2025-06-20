@@ -20,6 +20,9 @@ function logout() {
       <router-link to="/subjects" v-if="isLoggedIn">주제변경</router-link>
     </li>
     <li class="menu">
+      <router-link to="/mypage" v-if="isLoggedIn">회원 정보</router-link>
+    </li>
+    <li class="menu">
       <el-button to="/" v-if="isLoggedIn" @click="logout">로그아웃</el-button>
     </li>
   </ul>

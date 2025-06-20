@@ -4,6 +4,7 @@ import router from '@/router'
 import { ElMessage } from 'element-plus'
 import LoginParams from '@/request/LoginParams.ts'
 import { useAuthStore } from '@/store/useAuthStore.ts'
+import User from '@/entity/User.ts'
 
 @singleton()
 export default class SocialAuthRepository {
@@ -46,6 +47,23 @@ export default class SocialAuthRepository {
           auth.logout()
           router.replace('/')
         }
+      })
+  }
+
+  public getUserInfo(auth: string | null) {
+    return this.httpRepository
+      .get(
+        {
+          path: '/social/info',
+          method: 'GET',
+          headers: {
+            Authorization: auth,
+          },
+        },
+        User,
+      )
+      .then((r) => {
+        return r
       })
   }
 }
