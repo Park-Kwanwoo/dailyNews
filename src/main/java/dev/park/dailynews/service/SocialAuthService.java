@@ -3,10 +3,13 @@ package dev.park.dailynews.service;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
 import dev.park.dailynews.dto.response.sosical.SocialLogoutParams;
+import dev.park.dailynews.dto.response.sosical.SocialUserResponse;
 import dev.park.dailynews.dto.response.token.TokenResponse;
 import dev.park.dailynews.exception.ExpiredTokenException;
 import dev.park.dailynews.exception.InvalidTokenException;
+import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
+import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.model.SocialUserInfoContext;
 import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.repository.user.UserRepository;
@@ -73,5 +76,13 @@ public class SocialAuthService {
         } catch (JwtException e) {
             throw new InvalidTokenException();
         }
+    }
+
+    public SocialUserResponse getUserInfo(LoginUserContext userContext) {
+
+        User savedUser = userRepository.findByEmail(userContext.getEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        return SocialUserResponse.from(savedUser.getNickname(), savedUser.getEmail(), savedUser.getProvider());
     }
 }

@@ -3,16 +3,14 @@ package dev.park.dailynews.controller;
 import dev.park.dailynews.common.CookieUtils;
 import dev.park.dailynews.dto.response.common.ApiResponse;
 import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
+import dev.park.dailynews.dto.response.sosical.SocialUserResponse;
 import dev.park.dailynews.dto.response.token.TokenResponse;
+import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.service.SocialAuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,5 +33,11 @@ public class SocialAuthController {
     public ApiResponse<Void> socialLogout(@RequestAttribute("accessToken") String accessToken) {
         socialAuthService.logout(accessToken);
         return ApiResponse.successWithNoContent();
+    }
+
+    @GetMapping("/social/info")
+    public ApiResponse<SocialUserResponse> getUserInfo(LoginUserContext userContext) {
+        SocialUserResponse socialUserResponse = socialAuthService.getUserInfo(userContext);
+        return ApiResponse.successWithContent(socialUserResponse);
     }
 }
