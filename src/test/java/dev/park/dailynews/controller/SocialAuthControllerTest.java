@@ -156,8 +156,8 @@ class SocialAuthControllerTest {
     }
 
     @Test
-    @DisplayName("소셜_회원_정보_가져오기")
-    void GET_SOCIAL_USER_INFO() throws Exception {
+    @DisplayName("회원_정보_응답")
+    void RESPONSE_USER_INFO() throws Exception {
 
         // given
         User user = User.builder()
