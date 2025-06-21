@@ -7,7 +7,7 @@ import router from '@/router'
 import { SOCIAL_AUTH_REPOSITORY } from '@/repository/httpProviders.ts'
 
 const { socialEnv } = useSocialEnv()
-const redirect_uri = window.location.origin + ':80'
+const redirect_uri = window.location.origin + ':443'
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn())
 
