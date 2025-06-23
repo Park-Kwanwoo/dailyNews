@@ -43,7 +43,7 @@ public class NewsService {
     }
 
     public void createNews(String keyword, Long userId) {
-        NewsParse newsParse = client.post(keyword);
+        NewsParse newsParse = client.getSummarizedNews(keyword);
 
         User savedUser = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
