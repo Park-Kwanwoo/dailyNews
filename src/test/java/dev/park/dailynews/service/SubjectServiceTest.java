@@ -3,6 +3,7 @@ package dev.park.dailynews.service;
 import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.request.SubjectRequest;
+import dev.park.dailynews.dto.request.SubjectUpdateRequest;
 import dev.park.dailynews.dto.response.subject.SubjectResponse;
 import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.repository.subject.SubjectRepository;
@@ -58,14 +59,14 @@ class SubjectServiceTest {
     void UPDATE_SUBJECT() {
 
         // given
-        SubjectRequest subjectRequest = new SubjectRequest("비트코인 전망");
+        SubjectUpdateRequest subjectUpdateRequest = new SubjectUpdateRequest("비트코인 전망");
         LoginUserContext loginUserContext = new LoginUserContext("test@mail.com");
         Subject savedSubject = Subject.builder().keyword("AI 전망").build();
 
         given(subjectRepository.findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")))).willReturn(savedSubject);
 
         // when
-        subjectService.update(subjectRequest, loginUserContext);
+        subjectService.update(subjectUpdateRequest, loginUserContext);
 
         // then
         verify(subjectRepository, times(1)).findSubjectByUser(argThat(s -> s != null && s.matches("^[^@]+@[^@]+\\.[^@]+$")));

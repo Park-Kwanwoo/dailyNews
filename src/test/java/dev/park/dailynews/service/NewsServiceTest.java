@@ -2,6 +2,9 @@ package dev.park.dailynews.service;
 
 import dev.park.dailynews.domain.news.News;
 import dev.park.dailynews.domain.news.NewsItem;
+import dev.park.dailynews.domain.news.NewsParse;
+import dev.park.dailynews.domain.social.SocialProvider;
+import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.request.PagingRequest;
 import dev.park.dailynews.dto.response.common.PagingResponse;
@@ -22,9 +25,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static dev.park.dailynews.domain.social.SocialProvider.KAKAO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +48,52 @@ public class NewsServiceTest {
     @Mock
     private UserRepository userRepository;
 
+
+    @Test
+    @DisplayName("뉴스_요약_저장")
+    void test() {
+
+        // given
+        User user = User.builder()
+                .email("")
+                .build();
+
+
+        // when
+        newsService.issueAndStoreNews();
+    }
+
+    @Test
+    @DisplayName("뉴스_생성_및_저장")
+    void GENERATE_NEWS_SUMMARY_AND_SAVE() {
+
+        // given
+        User user = User.builder()
+                .id(1L)
+                .email("test@mail.com")
+                .provider(KAKAO)
+                .nickname("카카오")
+                .build();
+
+        Subject subject = Subject.builder()
+                .keyword("LCK")
+                .build();
+
+        user.setSubject(subject);
+        NewsParse mockNewsParse = mock(NewsParse.class);
+
+
+        given(userRepository.findAllWithSubject()).willReturn(List.of(user));
+        given(client.getSummarizedNews(subject.getKeyword())).willReturn(mockNewsParse);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        // when
+        newsService.issueAndStoreNews();
+
+        // then
+        verify(newsRepository, times(1)).save(any());
+        verify(userRepository, times(1)).findById(1L);
+    }
 
     @Test
     @DisplayName("뉴스_페이징_조회")
