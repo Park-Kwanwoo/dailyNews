@@ -3,6 +3,7 @@ package dev.park.dailynews.service;
 import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.request.SubjectRequest;
+import dev.park.dailynews.dto.request.SubjectUpdateRequest;
 import dev.park.dailynews.dto.response.subject.SubjectResponse;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.model.LoginUserContext;
@@ -34,15 +35,15 @@ public class SubjectService {
     }
 
     @Transactional
-    public SubjectResponse update(SubjectRequest subjectRequest, LoginUserContext userContext) {
+    public SubjectResponse update(SubjectUpdateRequest subjectUpdateRequest, LoginUserContext userContext) {
 
         Subject savedSubject = subjectRepository.findSubjectByUser(userContext.getEmail());
 
         if (savedSubject != null) {
-            savedSubject.changeKeyword(subjectRequest.getKeyword());
+            savedSubject.changeKeyword(subjectUpdateRequest.getKeyword());
         }
 
-        return new SubjectResponse(subjectRequest.getKeyword());
+        return new SubjectResponse(savedSubject.getKeyword());
     }
 
     public SubjectResponse getSubject(LoginUserContext userContext) {
