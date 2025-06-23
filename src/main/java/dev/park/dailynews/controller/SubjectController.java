@@ -1,6 +1,7 @@
 package dev.park.dailynews.controller;
 
 import dev.park.dailynews.dto.request.SubjectRequest;
+import dev.park.dailynews.dto.request.SubjectUpdateRequest;
 import dev.park.dailynews.dto.response.common.ApiResponse;
 import dev.park.dailynews.dto.response.subject.SubjectResponse;
 import dev.park.dailynews.model.LoginUserContext;
@@ -29,8 +30,8 @@ public class SubjectController {
     }
 
     @PatchMapping("/subject")
-    public ApiResponse<SubjectResponse> update(@RequestBody @Valid SubjectRequest subjectRequest, LoginUserContext userContext) {
-        SubjectResponse subjectResponse = subjectService.update(subjectRequest, userContext);
+    public ApiResponse<SubjectResponse> update(@RequestBody @Valid SubjectUpdateRequest subjectUpdateRequest, LoginUserContext userContext) {
+        SubjectResponse subjectResponse = subjectService.update(subjectUpdateRequest, userContext);
         return ApiResponse.successWithContent(subjectResponse);
     }
 }
