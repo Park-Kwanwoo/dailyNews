@@ -72,10 +72,9 @@ public class CustomOpenAIClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
         headers.add(AUTHORIZATION, "Bearer " + openAIProperties.getOpenaiKey());
-        try {
-            Resource resource = new ClassPathResource("newsAI.json");
-            InputStream inputStream = resource.getInputStream();
-            ObjectNode objectNode = objectMapper.readTree(inputStream).deepCopy();
+        Resource resource = new ClassPathResource("keywordAI.json");
+        try (InputStream is = resource.getInputStream()) {
+            ObjectNode objectNode = objectMapper.readTree(is).deepCopy();
             objectNode.put("input", keyword);
             return new HttpEntity<>(objectNode, headers);
         } catch (IOException e) {
@@ -113,10 +112,9 @@ public class CustomOpenAIClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
         headers.add(AUTHORIZATION, "Bearer " + openAIProperties.getOpenaiKey());
-        try {
-            Resource resource = new ClassPathResource("keywordAI.json");
-            InputStream inputStream = resource.getInputStream();
-            ObjectNode objectNode = objectMapper.readTree(inputStream).deepCopy();
+        Resource resource = new ClassPathResource("keywordAI.json");
+        try (InputStream is = resource.getInputStream()) {
+            ObjectNode objectNode = objectMapper.readTree(is).deepCopy();
             objectNode.put("input", keyword);
             return new HttpEntity<>(objectNode, headers);
         } catch (IOException e) {
