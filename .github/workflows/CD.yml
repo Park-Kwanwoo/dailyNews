@@ -52,7 +52,9 @@ jobs:
       ## OpenAI.json 파일 셋
       - name: Set OpenAI json
         id: OpenAI-Generator
-        run: echo ${{ secrets.OPEN_AI_JSON }} | base64 --decode >> src/main/resources/OpenAI.json
+        run: |
+          echo ${{ secrets.NEWS_AI_JSON }} | base64 --decode >> src/main/resources/newsAI.json
+          echo ${{ secrets.KEYWORD_AI_JSON }} | base64 --decode >> src/main/resources/keywordAI.json
 
       ## JDK 셋업
       - name: Set up JDK 17
