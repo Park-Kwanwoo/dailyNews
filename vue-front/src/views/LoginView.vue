@@ -54,7 +54,7 @@ function login(params: LoginParams) {
 <template>
   <div class="social_div d-flex flex-column align-items-center">
     <div>
-      <el-image src="/images/dailyNewsLogo.png"></el-image>
+      <el-image style="width: 500px" src="/images/dailyNewsLogo.png"></el-image>
     </div>
     <div>
       <h2>소셜 로그인</h2>
