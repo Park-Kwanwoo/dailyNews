@@ -37,6 +37,7 @@ export default class HttpRepository {
         return e
       })
   }
+
   public getList<T>(
     config: HttpRequestConfig,
     clazz: { new (...args: any[]): T },
@@ -52,6 +53,21 @@ export default class HttpRepository {
   }
 
   public post<T>(
+    config: HttpRequestConfig,
+    clazz: { new (...args: any[]): T } | null = null,
+  ): Promise<ApiResponse<T>> {
+    return this.httpClient
+      .request({ ...config })
+      .then((r) => {
+        const apiResponse = plainToInstance<ApiResponse<T>, any>(ApiResponse, r.data)
+        return apiResponse
+      })
+      .catch((e) => {
+        return e
+      })
+  }
+
+  public patch<T>(
     config: HttpRequestConfig,
     clazz: { new (...args: any[]): T } | null = null,
   ): Promise<ApiResponse<T>> {

@@ -7,7 +7,7 @@ import router from '@/router'
 import { SOCIAL_AUTH_REPOSITORY } from '@/repository/httpProviders.ts'
 
 const { socialEnv } = useSocialEnv()
-const redirect_uri = window.location.origin + ':80'
+const redirect_uri = window.location.origin + ':443'
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn())
 
@@ -53,6 +53,9 @@ function login(params: LoginParams) {
 
 <template>
   <div class="social_div d-flex flex-column align-items-center">
+    <div>
+      <el-image src="/images/dailyNewsLogo.png"></el-image>
+    </div>
     <div>
       <h2>소셜 로그인</h2>
     </div>

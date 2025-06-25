@@ -25,7 +25,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/news/{newsId}",
                         "/register/subject",
                         "/subject",
-                        "/social/logout"
+                        "/social/logout",
+                        "/social/info"
                 );
     }
     @Override
@@ -36,7 +37,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://54.180.42.38")
+                .allowedOrigins("https://dailynews.p-e.kr")
                 .allowedHeaders("*")
                 .allowedMethods("*")
                 .exposedHeaders("Authorization")

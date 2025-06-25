@@ -8,7 +8,7 @@ on:
 jobs:
   build:
 
-    if: ${{ !contains(github.event.head_commit.messages, '[skip]') && !contains(github.event.head_commit.messages, '[test]') }}
+    if: ${{ !contains(github.event.head_commit.messages, '[SKIP]') && !contains(github.event.head_commit.messages, '[TEST]') }}
     runs-on: self-hosted
 
     strategy:

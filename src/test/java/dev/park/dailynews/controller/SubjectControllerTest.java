@@ -1,10 +1,13 @@
 package dev.park.dailynews.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import dev.park.dailynews.config.DailyTest;
 import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.request.SubjectRequest;
+import dev.park.dailynews.dto.request.SubjectUpdateRequest;
 import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
 import dev.park.dailynews.model.UserContext;
@@ -18,11 +21,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import wiremock.org.apache.commons.io.IOUtils;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static dev.park.dailynews.domain.social.SocialProvider.NAVER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DailyTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@WireMockTest(httpPort = 8090)
 class SubjectControllerTest {
 
     @Autowired
@@ -56,7 +67,6 @@ class SubjectControllerTest {
 
     @BeforeEach
     void clean() {
-        userRepository.deleteAll();
         saveUser();
     }
 
@@ -97,13 +107,24 @@ class SubjectControllerTest {
     void SUCCESS_REGISTER_SUBJECT() throws Exception {
 
         // given
+        InputStream keywordStream = getClass().getClassLoader().getResourceAsStream("json/validKeywordResponse.json");
+        String keywordValidateResponse = IOUtils.toString(keywordStream, StandardCharsets.UTF_8);
+
+        stubFor(WireMock.post(urlEqualTo("/v1/responses"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(200)
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(keywordValidateResponse)
+                ));
+
         SubjectRequest subjectRequest = new SubjectRequest("AI 전망");
         String json = objectMapper.writeValueAsString(subjectRequest);
         UserContext userContext = createUserContext();
         String accessToken = jwtUtils.generateAccessToken(userContext);
 
-        // when
-        mockMvc.perform(post("/register/subject")
+        // expected
+        mockMvc.perform(post("/subject")
                         .contentType(APPLICATION_JSON)
                         .content(json)
                         .header(AUTHORIZATION, accessToken)
@@ -111,42 +132,115 @@ class SubjectControllerTest {
                 .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
                 .andDo(print());
 
-        Subject result = subjectRepository.findSubjectWithUserByEmail("test@mail.com");
-
-        // then
-        assertEquals("AI 전망", result.getKeyword());
-
     }
     
     @Test
-    @DisplayName("Subject가_이미_등록되어_있으면_update")
+    @DisplayName("Subject_수정_성공")
     @Transactional
-    void UPDATE_SUBJECT_WHEN_SUBJECT_ALREADY_REGISTERED() throws Exception {
+    void SUCCESS_UPDATE_SUBJECT() throws Exception {
         
         // given
         saveSubject();
+        InputStream keywordStream = getClass().getClassLoader().getResourceAsStream("json/validKeywordResponse.json");
+        String validKeywordResponse = IOUtils.toString(keywordStream, StandardCharsets.UTF_8);
+
+        stubFor(WireMock.post(urlEqualTo("/v1/responses"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(200)
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(validKeywordResponse)
+                ));
+
+
         SubjectRequest subjectRequest = new SubjectRequest("비트코인 전망");
         String json = objectMapper.writeValueAsString(subjectRequest);
         UserContext userContext = createUserContext();
         String accessToken = jwtUtils.generateAccessToken(userContext);
 
-        // when
-        mockMvc.perform(post("/register/subject")
+        // expected
+        mockMvc.perform(patch("/subject")
                         .contentType(APPLICATION_JSON)
                         .content(json)
                         .header(AUTHORIZATION, accessToken)
                 )
                 .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
                 .andDo(print());
-
-        Subject result = subjectRepository.findSubjectWithUserByEmail("test@mail.com");
-
-        // then
-        assertEquals("비트코인 전망", result.getKeyword());
     }
 
     @Test
-    @DisplayName("부적절한_값을_등록_시_예외_발생")
+    @DisplayName("부적절한_주제_등록_시_예외")
+    @Transactional
+    void THROW_BAD_KEYWORD_EXCEPTION_WHEN_SAVE() throws Exception {
+
+        // given
+        InputStream keywordStream = getClass().getClassLoader().getResourceAsStream("json/invalidKeywordResponse.json");
+        String invalidKeywordResponse = IOUtils.toString(keywordStream, StandardCharsets.UTF_8);
+
+        stubFor(WireMock.post(urlEqualTo("/v1/responses"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(200)
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(invalidKeywordResponse)
+                ));
+
+
+        SubjectRequest subjectRequest = new SubjectRequest("아아");
+        String json = objectMapper.writeValueAsString(subjectRequest);
+        UserContext userContext = createUserContext();
+        String accessToken = jwtUtils.generateAccessToken(userContext);
+
+        // expected
+        mockMvc.perform(post("/subject")
+                        .contentType(APPLICATION_JSON)
+                        .content(json)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                .andExpect(jsonPath("$.message").value("주제로 부적합한 키워드입니다."))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("부적절한_주제_수정_시_예외")
+    @Transactional
+    void THROW_BAD_KEYWORD_EXCEPTION_WHEN_UPDATE() throws Exception {
+
+        // given
+        saveSubject();
+        InputStream keywordStream = getClass().getClassLoader().getResourceAsStream("json/invalidKeywordResponse.json");
+        String invalidKeywordResponse = IOUtils.toString(keywordStream, StandardCharsets.UTF_8);
+
+        stubFor(WireMock.post(urlEqualTo("/v1/responses"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(200)
+                                .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                .withBody(invalidKeywordResponse)
+                ));
+
+
+        SubjectUpdateRequest subjectUpdateRequest = new SubjectUpdateRequest("아아");
+        String json = objectMapper.writeValueAsString(subjectUpdateRequest);
+        UserContext userContext = createUserContext();
+        String accessToken = jwtUtils.generateAccessToken(userContext);
+
+        // expected
+        mockMvc.perform(patch("/subject")
+                        .contentType(APPLICATION_JSON)
+                        .content(json)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                .andExpect(jsonPath("$.message").value("주제로 부적합한 키워드입니다."))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("빈_값_등록_시_예외_발생")
     void THROW_EXCEPTION_REQUEST_INVALID_SUBJECT() throws Exception {
 
         // given
@@ -157,7 +251,7 @@ class SubjectControllerTest {
 
 
         // expected
-        mockMvc.perform(post("/register/subject")
+        mockMvc.perform(post("/subject")
                         .contentType(APPLICATION_JSON)
                         .content(json)
                         .header(AUTHORIZATION, accessToken)
@@ -165,6 +259,62 @@ class SubjectControllerTest {
                 .andExpect(jsonPath("$.statusCode").value("ERROR"))
                 .andExpect(jsonPath("$.data[0].field").value("keyword"))
                 .andExpect(jsonPath("$.data[0].message").value("값을 입력해주세요."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("OpenAI_서버_500_에러")
+    void OpenAI_INTERNAL_SERVER_ERROR() throws Exception {
+
+        // given
+        stubFor(WireMock.post(urlEqualTo("/v1/responses"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(500)
+                                .withHeader(AUTHORIZATION, APPLICATION_JSON_VALUE)
+                ));
+
+        SubjectRequest subjectRequest = new SubjectRequest("개발자 전망");
+        String json = objectMapper.writeValueAsString(subjectRequest);
+        UserContext userContext = createUserContext();
+        String accessToken = jwtUtils.generateAccessToken(userContext);
+
+        // expected
+        mockMvc.perform(post("/subject")
+                        .contentType(APPLICATION_JSON)
+                        .content(json)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                .andExpect(jsonPath("$.message").value("요청에 실패했습니다."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("OpenAI_서버_타임아웃")
+    void OpenAI_TIMEOUT_ERROR() throws Exception {
+
+        // given
+        stubFor(WireMock.post(urlEqualTo("/v1/responses"))
+                .willReturn(
+                        aResponse()
+                                .withFixedDelay(60000)
+                                .withHeader(AUTHORIZATION, APPLICATION_JSON_VALUE)
+                ));
+
+        SubjectRequest subjectRequest = new SubjectRequest("개발자 전망");
+        String json = objectMapper.writeValueAsString(subjectRequest);
+        UserContext userContext = createUserContext();
+        String accessToken = jwtUtils.generateAccessToken(userContext);
+
+        // expected
+        mockMvc.perform(post("/subject")
+                        .contentType(APPLICATION_JSON)
+                        .content(json)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                .andExpect(jsonPath("$.message").value("연결에 실패했습니다."))
                 .andDo(print());
     }
 }

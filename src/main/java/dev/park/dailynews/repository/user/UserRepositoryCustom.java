@@ -6,7 +6,5 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
 
-    User findByEmailWithSubjectLeftJoin(String email);
-
     List<User> findAllWithSubject();
 }

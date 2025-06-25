@@ -1,6 +1,5 @@
 package dev.park.dailynews.interceptor;
 
-import dev.park.dailynews.common.CookieUtils;
 import dev.park.dailynews.exception.UnAuthorized;
 import dev.park.dailynews.infra.auth.jwt.TokenValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
@@ -22,7 +22,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 
         String accessToken = request.getHeader("Authorization");
 
-        if (accessToken == null || !tokenValidator.validToken(accessToken)) {
+        if (!StringUtils.hasText(accessToken) || !tokenValidator.validToken(accessToken)) {
             throw new UnAuthorized();
         }
 

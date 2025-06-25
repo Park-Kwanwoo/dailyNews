@@ -1,14 +1,12 @@
 package dev.park.dailynews.service;
 
 import dev.park.dailynews.domain.user.User;
-import dev.park.dailynews.dto.response.sosical.KakaoLoginParams;
-import dev.park.dailynews.dto.response.sosical.NaverLoginParams;
-import dev.park.dailynews.dto.response.sosical.SocialLoginParams;
-import dev.park.dailynews.dto.response.sosical.SocialLogoutParams;
+import dev.park.dailynews.dto.response.sosical.*;
 import dev.park.dailynews.dto.response.token.TokenResponse;
 import dev.park.dailynews.exception.ExpiredTokenException;
 import dev.park.dailynews.exception.InvalidTokenException;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
+import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.model.SocialUserInfoContext;
 import dev.park.dailynews.model.UserContext;
 import dev.park.dailynews.repository.user.UserRepository;
@@ -154,6 +152,32 @@ public class SocialAuthServiceTest {
         verify(jwtUtils, times(1)).extractSocialToken(mockAccessToken);
         verify(jwtUtils, times(1)).extractProvider(mockAccessToken);
         verify(jwtUtils, times(1)).extractExpiration(mockAccessToken);
+    }
+
+    @Test
+    @DisplayName("회원_정보_조회")
+    void GET_USER_INFO() {
+
+        // given
+        User savedUser = User.builder()
+                .email("fakeSocial@mail.com")
+                .nickname("소셜유저")
+                .provider(KAKAO)
+                .build();
+
+        LoginUserContext mockUserContext = mock(LoginUserContext.class);
+
+        given(userRepository.findByEmail(mockUserContext.getEmail())).willReturn(Optional.of(savedUser));
+
+        // when
+        SocialUserResponse userResponse = socialAuthService.getUserInfo(mockUserContext);
+
+        // then
+        verify(userRepository, times(1)).findByEmail(mockUserContext.getEmail());
+        assertEquals(savedUser.getEmail(), userResponse.getEmail());
+        assertEquals(savedUser.getNickname(), userResponse.getNickname());
+        assertEquals(savedUser.getProvider().toString(), userResponse.getProvider());
+
     }
 
     @Test

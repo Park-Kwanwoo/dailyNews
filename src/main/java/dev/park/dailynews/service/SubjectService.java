@@ -3,7 +3,9 @@ package dev.park.dailynews.service;
 import dev.park.dailynews.domain.subject.Subject;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.dto.request.SubjectRequest;
+import dev.park.dailynews.dto.request.SubjectUpdateRequest;
 import dev.park.dailynews.dto.response.subject.SubjectResponse;
+import dev.park.dailynews.exception.UserNotFoundException;
 import dev.park.dailynews.model.LoginUserContext;
 import dev.park.dailynews.repository.subject.SubjectRepository;
 import dev.park.dailynews.repository.user.UserRepository;
@@ -19,20 +21,10 @@ public class SubjectService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void register(SubjectRequest subjectRequest, LoginUserContext user) {
+    public void save(SubjectRequest subjectRequest, LoginUserContext userContext) {
 
-        boolean exist = subjectRepository.existsSubjectByUserEmail(user.getEmail());
-
-        if (exist) {
-            update(subjectRequest, user);
-        } else {
-            save(subjectRequest, user);
-        }
-    }
-
-    public void save(SubjectRequest subjectRequest, LoginUserContext user) {
-
-        User savedUser = userRepository.findByEmailWithSubjectLeftJoin(user.getEmail());
+        User savedUser = userRepository.findByEmail(userContext.getEmail())
+                .orElseThrow(UserNotFoundException::new);
 
         Subject subject = Subject.builder()
                 .keyword(subjectRequest.getKeyword())
@@ -42,18 +34,21 @@ public class SubjectService {
         subjectRepository.save(subject);
     }
 
-    public void update(SubjectRequest subjectRequest, LoginUserContext user) {
+    @Transactional
+    public SubjectResponse update(SubjectUpdateRequest subjectUpdateRequest, LoginUserContext userContext) {
 
-        Subject savedSubject = subjectRepository.findSubjectWithUserByEmail(user.getEmail());
+        Subject savedSubject = subjectRepository.findSubjectByUser(userContext.getEmail());
 
         if (savedSubject != null) {
-            savedSubject.changeKeyword(subjectRequest.getKeyword());
+            savedSubject.changeKeyword(subjectUpdateRequest.getKeyword());
         }
+
+        return new SubjectResponse(savedSubject.getKeyword());
     }
 
-    public SubjectResponse getSubject(LoginUserContext user) {
+    public SubjectResponse getSubject(LoginUserContext userContext) {
 
-        Subject subject = subjectRepository.findSubjectWithUserByEmail(user.getEmail());
+        Subject subject = subjectRepository.findSubjectByUser(userContext.getEmail());
         return subject == null ? new SubjectResponse("") : SubjectResponse.from(subject.getKeyword());
     }
 }
