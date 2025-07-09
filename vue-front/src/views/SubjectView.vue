@@ -25,12 +25,12 @@ const state = reactive<StateType>({
 })
 
 function isValidKoreanSentence(str: string) {
-  return !/^[가-힣\s]+$/.test(str.trim())
+  return !/^[가-힣a-zA-Z0-9\s]+$/.test(str.trim())
 }
 
 function registerSubject() {
   if (state.subjectRequest.keyword == '' || isValidKoreanSentence(state.subjectRequest.keyword)) {
-    ElMessage.error('한글로된 주제를 입력해주세요.')
+    ElMessage.error('의미있는 주제를 입력해주세요.')
   } else {
     SUBJECT_REPOSITORY.save(state.subjectRequest, accessToken)
   }
@@ -38,7 +38,7 @@ function registerSubject() {
 
 function editSubject() {
   if (state.subjectRequest.keyword == '' || isValidKoreanSentence(state.subjectRequest.keyword)) {
-    ElMessage.error('한글로된 주제를 입력해주세요.')
+    ElMessage.error('의미있는 주제를 입력해주세요.')
   } else {
     SUBJECT_REPOSITORY.update(state.subjectRequest, accessToken)
   }
