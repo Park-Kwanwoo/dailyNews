@@ -72,7 +72,7 @@ public class CustomOpenAIClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
         headers.add(AUTHORIZATION, "Bearer " + openAIProperties.getOpenaiKey());
-        Resource resource = new ClassPathResource("keywordAI.json");
+        Resource resource = new ClassPathResource("newsAI.json");
         try (InputStream is = resource.getInputStream()) {
             ObjectNode objectNode = objectMapper.readTree(is).deepCopy();
             objectNode.put("input", keyword);
