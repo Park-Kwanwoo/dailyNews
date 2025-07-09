@@ -69,6 +69,9 @@ dependencies {
 
     // open-ai chat gpt
     implementation("com.openai:openai-java:2.2.0")
+
+    // Json Object
+    implementation 'org.json:json:20250517'
 }
 
 // 생성자 바인딩을 위해 컴파일 옵션 추가
