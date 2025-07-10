@@ -22,7 +22,7 @@ export default class SubjectRepository {
       .then((r) => {
         const statusCode = r.statusCode
         if (statusCode == 'SUCCESS') router.go(0)
-        else {
+        else if (statusCode == 'ERROR') {
           ElMessage.error(r.message)
         }
       })
@@ -61,6 +61,9 @@ export default class SubjectRepository {
       .then((r) => {
         const statusCode = r.statusCode
         if (statusCode == 'SUCCESS') router.go(0)
+        else if (statusCode == 'ERROR') {
+          ElMessage.error(r.message)
+        }
       })
       .catch((e) => {
         ElMessage.error('주제가 수정되지 않았습니다. 다시 시도해주세요')
