@@ -1,4 +1,4 @@
-name: Application CD
+name: Application Deploy
 
 on:
   push:
@@ -44,10 +44,8 @@ jobs:
           mv vue-front/dist/* src/main/resources/static
 
       ## YML 설정 파일 생성
-      - name: Set Secret yml
-        run: |
-          echo ${{ secrets.APPLICATION_DB_YML }} | base64 --decode >> src/main/resources/application-prod-db.yml
-          echo ${{ secrets.APPLICATION_KEY_YML }} | base64 --decode >> src/main/resources/application-prod-key.yml
+      - name: Set yml
+        run: echo ${{ secrets.APPLICATION_YML }} | base64 --decode >> src/main/resources/application.yml
 
       ## OpenAI.json 파일 셋
       - name: Set OpenAI json
@@ -83,7 +81,7 @@ jobs:
 
       ## 프로젝트 빌드
       - name: Build Application
-        run: ./gradlew clean build -x test
+        run: ./gradlew build
 
       ## docker 이미지로 빌드
       - name: Docker Build and Push
