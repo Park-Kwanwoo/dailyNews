@@ -16,7 +16,7 @@ jobs:
         node-version: [ 22.x ]
 
     steps:
-      ## 레포지토리의 특정 브랜치, 커밋을 가져오는 설정
+      # 레포지토리의 특정 브랜치, 커밋을 가져오는 설정
       - uses: actions/checkout@v4
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.4.0
@@ -25,47 +25,60 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./vue-front/package-lock.json
 
-      ## Vue 환경변수 설정
+      # Vue 환경변수 설정
       - name: Setup Vue Environment variable
         run: |
           rm -rf vue-front/.env
           touch vue-front/./.env
           echo ${{ secrets.FRONT_API_KEY }} | base64 --decode >> vue-front/.env
 
-      ## Vue 프로젝트 의존성 설치
+      # Vue 프로젝트 의존성 설치
       - name: Install dependencies
         run: npm --prefix vue-front ci
 
-      ## Vue 프로젝트 빌드 및 빌드 파일 옮기기
+      # Vue 프로젝트 빌드 및 빌드 파일 옮기기
       - name: Build And Move Vue project
         run: |
           npm --prefix vue-front run build
           mkdir -p src/main/resources/static
           mv vue-front/dist/* src/main/resources/static
 
-      ## YML 설정 파일 생성
+      # YML 설정 파일 생성
       - name: Set yml
         run: echo ${{ secrets.APPLICATION_YML }} | base64 --decode >> src/main/resources/application.yml
 
-      ## OpenAI.json 파일 셋
+      # OpenAI.json 파일 셋
       - name: Set OpenAI json
         id: OpenAI-Generator
         run: |
           echo ${{ secrets.NEWS_AI_JSON }} | base64 --decode >> src/main/resources/newsAI.json
           echo ${{ secrets.KEYWORD_AI_JSON }} | base64 --decode >> src/main/resources/keywordAI.json
 
-      ## JDK 셋업
+      # Test json 파일 설정
+      - name: Set test json
+        run: |
+          mkdir -p src/test/resources/json
+          echo ${{ secrets.INVALID_KEYWORD_JSON }} | base64 --decode >>src/test/resources/json/invalidKeywordResponse.json
+          echo ${{ secrets.KAKAO_LOGOUT_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/kakaoLogoutResponse.json
+          echo ${{ secrets.KAKAO_TOKEN_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/kakaoTokenResponse.json
+          echo ${{ secrets.KAKAO_USER_INFO_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/kakaoUserInfoResponse.json
+          echo ${{ secrets.NAVER_TOKEN_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/naverTokenResponse.json
+          echo ${{ secrets.NAVER_USER_INFO_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/naverUserInfoResponse.json
+          echo ${{ secrets.NEWS_SUMMARY_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/newsSummaryResponse.json
+          echo ${{ secrets.VALID_KEYWORD_RESPONSE_JSON }} | base64 --decode >>src/test/resources/json/validKeywordResponse.json
+
+      # JDK 셋업
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      ## Gradle 셋업
+      # Gradle 셋업
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      ## Gradle 빌드에 필요한 데이터를 캐싱하여 빌드 속도를 향상
+      # Gradle 빌드에 필요한 데이터를 캐싱하여 빌드 속도를 향상
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -75,15 +88,15 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      ## Gradle 권한 부여
+      # Gradle 권한 부여
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      ## 프로젝트 빌드
+      # 프로젝트 빌드
       - name: Build Application
         run: ./gradlew build
 
-      ## docker 이미지로 빌드
+      # docker 이미지로 빌드
       - name: Docker Build and Push
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
@@ -91,7 +104,7 @@ jobs:
           docker push pgw4712/dailynews:latest
           docker logout
 
-      ## deploy.sh로 ec2 docker 프로세스 실행
+      # deploy.sh로 ec2 docker 프로세스 실행
       - name: Execute deploy.sh
         run: |
           rm -rf .env
