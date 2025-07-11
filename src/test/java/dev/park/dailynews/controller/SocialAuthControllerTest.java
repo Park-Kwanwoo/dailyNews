@@ -42,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DailyTest
 @AutoConfigureMockMvc
 @WireMockTest(httpPort = 8090)
-@ActiveProfiles("test")
 class SocialAuthControllerTest {
 
     @Autowired

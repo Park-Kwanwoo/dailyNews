@@ -1,5 +1,6 @@
 package dev.park.dailynews.controller;
 
+import dev.park.dailynews.config.DailyTest;
 import dev.park.dailynews.domain.user.User;
 import dev.park.dailynews.infra.auth.jwt.JwtUtils;
 import dev.park.dailynews.model.UserContext;
@@ -22,9 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@DailyTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class TokenControllerTest {
 
     @Autowired
@@ -32,9 +32,6 @@ class TokenControllerTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -90,14 +87,6 @@ class TokenControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.statusCode").value("SUCCESS"))
                 .andDo(print());
-
-        // then
-//        assertNotEquals(savedToken.getAccessToken(), reissuedToken.getAccessToken());
-//        assertNotEquals(savedToken.getRefreshToken(), reissuedToken.getRefreshToken());
-//        assertEquals(savedToken.getUuid(), reissuedToken.getUuid());
-//        assertEquals(savedToken.getIp(), reissuedToken.getIp());
-//        assertEquals(savedToken.getUserAgent(), reissuedToken.getUserAgent());
-//        assertEquals(savedToken.getEmail(), reissuedToken.getEmail());
 
     }
 

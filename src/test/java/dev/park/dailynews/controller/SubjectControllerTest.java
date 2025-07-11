@@ -39,7 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DailyTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 @WireMockTest(httpPort = 8090)
 class SubjectControllerTest {
 
