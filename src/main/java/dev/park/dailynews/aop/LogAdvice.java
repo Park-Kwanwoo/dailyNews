@@ -33,7 +33,9 @@ public class LogAdvice {
 
     }
 
-    @Pointcut("execution(* dev.park.dailynews..*Controller.*(..))")
+    @Pointcut("execution(* dev.park.dailynews..*Controller.*(..))" +
+            "&& !execution(* dev.park.dailynews.controller.NewsController.generateNews())"
+    )
     public void controller() {
 
     }
